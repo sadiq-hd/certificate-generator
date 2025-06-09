@@ -1,109 +1,117 @@
-# منشئ الشهادات - Certificate Generator
+# Certificate Generator
 
-تطبيق Angular 18 شامل لإنشاء وتخصيص الشهادات بطريقة سهلة ومرنة.
+A comprehensive Angular 18 application to easily create and customize certificates.
 
-## 🌟 الميزات الرئيسية
+## 🌟 Features
 
-- **اختيار القوالب**: مجموعة متنوعة من قوالب الشهادات القابلة للتخصيص
-- **إدخال البيانات**: رفع ملفات Excel أو إدخال يدوي للأسماء
-- **محرر متقدم**: سحب وإفلات النصوص مع تخصيص الخطوط والألوان
-- **معاينة شاملة**: عرض جميع الشهادات قبل التصدير
-- **تصدير متعدد التنسيقات**: PNG, JPG, PDF
-- **واجهة عربية**: دعم كامل للغة العربية مع RTL
+* **Template Selection**: A variety of customizable certificate templates
+* **Data Input**: Upload Excel files or enter names manually
+* **Advanced Editor**: Drag-and-drop text with customizable fonts and colors
+* **Full Preview**: Preview all certificates before export
+* **Multi-format Export**: PNG, JPG, PDF
+* **RTL Support**: Full Arabic language and RTL support
 
-## 🚀 البدء السريع
+## 🚀 Quick Start
 
-### المتطلبات
-- Node.js (الإصدار 18 أو أحدث)
-- Angular CLI
-- npm أو yarn
+### Requirements
 
-### التثبيت
+* Node.js (v18 or later)
+* Angular CLI
+* npm or yarn
 
-1. **نسخ المشروع**
+### Installation
+
+1. **Clone the Repository**
+
 ```bash
 git clone <repository-url>
 cd certificate-generator
 ```
 
-2. **تثبيت المكتبات**
+2. **Install Dependencies**
+
 ```bash
 npm install
 ```
 
-3. **إعداد Tailwind CSS**
+3. **Tailwind CSS Setup**
+
 ```bash
-# تم تكوينه مسبقاً في package.json
+# Already configured in package.json
 npm run build
 ```
 
-4. **تشغيل التطبيق**
+4. **Run the App**
+
 ```bash
 ng serve
 ```
 
-5. **فتح المتصفح**
+5. **Open in Browser**
+
 ```
 http://localhost:4200
 ```
 
-## 📁 هيكل المشروع
+## 📁 Project Structure
 
 ```
 src/
 ├── app/
-│   ├── components/          # المكونات الرئيسية
+│   ├── components/          # Core components
 │   │   ├── template-selector/
 │   │   ├── data-input/
 │   │   ├── certificate-editor/
 │   │   ├── preview-panel/
 │   │   └── export-panel/
-│   ├── services/           # الخدمات
+│   ├── services/            # Services
 │   │   ├── certificate.service.ts
 │   │   ├── template.service.ts
 │   │   ├── excel.service.ts
 │   │   └── export.service.ts
-│   ├── models/             # النماذج
+│   ├── models/              # Data models
 │   │   ├── student.model.ts
 │   │   ├── template.model.ts
 │   │   └── certificate.model.ts
-│   └── app.config.ts       # إعدادات التطبيق
+│   └── app.config.ts        # App configuration
 └── assets/
-    ├── templates/          # صور القوالب
-    ├── fonts/             # الخطوط (اختياري)
-    └── icons/             # الأيقونات
+    ├── templates/           # Template images
+    ├── fonts/               # Optional custom fonts
+    └── icons/               # Icons
 ```
 
-## 🎨 إضافة قوالب جديدة
+## 🎨 Adding New Templates
 
-1. **إضافة صورة القالب**
+1. **Add Template Image**
+
 ```bash
-# إضافة صورة القالب إلى
+# Add your template image to:
 src/assets/templates/your-template.png
 
-# إضافة صورة مصغرة (اختياري)
+# Add a thumbnail (optional):
 src/assets/templates/thumbs/your-template-thumb.png
 ```
 
-2. **تحديث ملف الإعدادات**
+2. **Update Configuration File**
+
 ```typescript
-// في src/app/app.config.ts
+// Inside src/app/app.config.ts
 export const AppConfig = {
   templates: [
     {
       id: 'unique-id',
-      name: 'اسم القالب',
+      name: 'Template Name',
       imagePath: 'assets/templates/your-template.png',
       thumbnail: 'assets/templates/thumbs/your-template-thumb.png',
       width: 800,
       height: 600,
-      description: 'وصف القالب',
+      description: 'Template description',
       textAreas: [
         {
           id: 'name',
-          label: 'اسم الطالب',
-          x: 400, // موقع أفقي (من المنتصف)
-          y: 250, // موقع عمودي (من المنتصف)
+          label: 'Student Name',
+          x: 400,
+          y: 250,
           width: 300,
           height: 60,
           fontSize: 36,
@@ -111,92 +119,101 @@ export const AppConfig = {
           color: '#000000',
           textAlign: 'center',
           fontWeight: 'bold',
-          defaultText: '[اسم الطالب]',
+          defaultText: '[Student Name]',
           isDraggable: true,
           isResizable: true
         }
-        // إضافة المزيد من مناطق النص حسب الحاجة
       ]
     }
   ]
 };
 ```
 
-## 📊 إعداد ملفات Excel
+## 📊 Excel File Format
 
-يجب أن يحتوي ملف Excel على:
-- **العمود الأول**: أسماء الطلاب
-- **أعمدة إضافية**: معلومات أخرى (اختياري)
+Your Excel file should contain:
 
-### مثال على ملف Excel:
-| اسم الطالب | التخصص | المعدل |
-|------------|---------|--------|
-| أحمد محمد | هندسة | 3.8 |
-| فاطمة علي | طب | 3.9 |
+* **First Column**: Student names
+* **Additional Columns**: Optional fields (e.g., major, GPA)
 
-## ⚙️ التخصيص المتقدم
+### Example:
 
-### إضافة خطوط جديدة
+| Student Name   | Major       | GPA |
+| -------------- | ----------- | --- |
+| Ahmed Mohammed | Engineering | 3.8 |
+| Fatima Ali     | Medicine    | 3.9 |
+
+## ⚙️ Advanced Customization
+
+### Add Custom Fonts
+
 ```typescript
-// في src/app/app.config.ts
+// In src/app/app.config.ts
 fonts: [
-  { name: 'خط مخصص', value: 'CustomFont, Arial, sans-serif' }
+  { name: 'Custom Font', value: 'CustomFont, Arial, sans-serif' }
 ]
 ```
 
-### تخصيص تنسيقات التصدير
+### Export Format Options
+
 ```typescript
-// في src/app/app.config.ts
+// In src/app/app.config.ts
 exportFormats: [
-  { name: 'WebP', value: 'webp', description: 'تنسيق حديث عالي الجودة' }
+  { name: 'WebP', value: 'webp', description: 'Modern high-quality format' }
 ]
 ```
 
-## 🛠️ البناء والنشر
+## 🛠️ Build & Deploy
 
-### بناء للإنتاج
+### Production Build
+
 ```bash
 ng build --configuration production
 ```
 
-### النشر على خادم
+### Deploy to Server
+
 ```bash
-# نسخ مجلد dist إلى الخادم
+# Copy dist folder to your web server directory
 cp -r dist/certificate-generator/* /var/www/html/
 ```
 
-## 🐛 استكشاف الأخطاء
+## 🐛 Troubleshooting
 
-### مشاكل شائعة:
+### Common Issues:
 
-1. **ملفات القوالب لا تظهر**
-   - تأكد من وجود الملفات في `src/assets/templates/`
-   - تحقق من صحة المسارات في `app.config.ts`
+1. **Templates Not Showing**
 
-2. **خطأ في قراءة Excel**
-   - تأكد من أن الملف يحتوي على أسماء في العمود الأول
-   - جرب حفظ الملف بتنسيق xlsx
+   * Check if files exist in `src/assets/templates/`
+   * Ensure correct paths in `app.config.ts`
 
-3. **مشاكل في التصدير**
-   - تأكد من أن المتصفح يدعم تحميل الملفات
-   - جرب تقليل جودة التصدير
+2. **Excel Read Errors**
 
-## 📝 الترخيص
+   * Ensure names are in the first column
+   * Try saving the file as `.xlsx`
 
-هذا المشروع مفتوح المصدر ومتاح للاستخدام والتطوير.
+3. **Export Issues**
 
-## 🤝 المساهمة
+   * Make sure your browser supports file downloads
+   * Try reducing export quality if needed
 
-نرحب بالمساهمات! يرجى:
-1. عمل Fork للمشروع
-2. إنشاء فرع جديد للميزة
-3. تطبيق التغييرات
-4. إرسال Pull Request
+## 📝 License
 
-## 📧 الدعم
+This project is open-source and available for use and development.
 
-للحصول على الدعم أو الإبلاغ عن مشاكل، يرجى إنشاء Issue في المستودع.
+## 🤝 Contributing
+
+We welcome contributions! Please:
+
+1. Fork the repo
+2. Create a feature branch
+3. Make your changes
+4. Submit a Pull Request
+
+## 📧 Support
+
+For support or to report issues, please open an Issue in the repository.
 
 ---
 
-**تم التطوير بـ ❤️ لخدمة المجتمع التعليمي**
+**Developed with ❤️ by Sadiq Al-Dubaissi**
