@@ -1,3 +1,4 @@
+<!-- معاينة الشهادات - بدون صور طلاب -->
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-8">
     <div class="max-w-6xl mx-auto">
       <!-- Header -->
@@ -8,13 +9,12 @@
   
       <!-- Progress Bar -->
       <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
-        <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" 
-             style="width: 80%"></div>
+        <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 80%"></div>
       </div>
   
       <!-- Summary Info -->
       <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="text-center">
             <div class="text-3xl font-bold text-blue-600">{{ certificates.length }}</div>
             <div class="text-sm text-gray-600">إجمالي الشهادات</div>
@@ -27,396 +27,121 @@
             <div class="text-3xl font-bold text-purple-600">{{ getEstimatedSize() }}</div>
             <div class="text-sm text-gray-600">الحجم المتوقع</div>
           </div>
-          <div class="text-center">
-            <div class="text-3xl font-bold text-orange-600">{{ getCurrentDateTime() }}</div>
-            <div class="text-sm text-gray-600">تاريخ الإنشاء</div>
-          </div>
         </div>
       </div>
   
-      <!-- Controls -->
-      <div class="bg-white rounded-lg shadow-md p-4 mb-6">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-          <!-- View Mode -->
-          <div class="flex items-center space-x-4">
-            <span class="text-sm font-medium text-gray-700">عرض:</span>
-            <div class="flex space-x-2">
-              <button (click)="setViewMode('grid')"
-                      [class.bg-blue-500]="viewMode === 'grid'"
-                      [class.text-white]="viewMode === 'grid'"
-                      [class.bg-gray-200]="viewMode !== 'grid'"
-                      class="px-3 py-2 rounded transition-colors">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
-                </svg>
-              </button>
-              <button (click)="setViewMode('list')"
-                      [class.bg-blue-500]="viewMode === 'list'"
-                      [class.text-white]="viewMode === 'list'"
-                      [class.bg-gray-200]="viewMode !== 'list'"
-                      class="px-3 py-2 rounded transition-colors">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
-                </svg>
-              </button>
-              <button (click)="setViewMode('single')"
-                      [class.bg-blue-500]="viewMode === 'single'"
-                      [class.text-white]="viewMode === 'single'"
-                      [class.bg-gray-200]="viewMode !== 'single'"
-                      class="px-3 py-2 rounded transition-colors">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-  
-          <!-- Search -->
-          <div class="flex-1 max-w-md">
-            <input type="text" 
-                   [(ngModel)]="searchTerm"
-                   (ngModelChange)="filterCertificates()"
-                   placeholder="البحث عن طالب..."
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-          </div>
-  
-          <!-- Actions -->
-          <div class="flex items-center space-x-2">
-            <button (click)="selectAll()"
-                    class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors">
-              تحديد الكل
-            </button>
-            <button (click)="clearSelection()"
-                    class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors">
-              إلغاء التحديد
-            </button>
-          </div>
-        </div>
-      </div>
-  
-      <!-- No Certificates Message -->
-      <div *ngIf="filteredCertificates.length === 0" class="text-center py-12">
-        <div class="text-gray-400 mb-4">
-          <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm1 0v12h12V4H4z" clip-rule="evenodd"></path>
-          </svg>
-        </div>
-        <h3 class="text-lg font-medium text-gray-600 mb-2">لا توجد شهادات</h3>
-        <p class="text-gray-500">لم يتم العثور على شهادات مطابقة لبحثك</p>
-      </div>
-  
-      <!-- Grid View -->
-      <div *ngIf="viewMode === 'grid' && filteredCertificates.length > 0" 
-           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <div *ngFor="let certificate of filteredCertificates; let i = index; trackBy: trackByCertificateId"
-             class="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
-             [class.ring-2]="selectedCertificates.has(certificate.id)"
-             [class.ring-blue-500]="selectedCertificates.has(certificate.id)"
-             (click)="toggleCertificateSelection(certificate.id)">
-          
+      <!-- Certificate Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div *ngFor="let certificate of certificates" class="bg-white rounded-lg shadow-md overflow-hidden">
           <!-- Certificate Preview -->
           <div class="relative h-48 bg-gray-100">
-            <div [id]="'certificate-preview-' + certificate.id" 
-                 class="certificate-preview w-full h-full relative overflow-hidden">
+            <img [src]="certificate.template.imagePath" class="w-full h-full object-cover">
+            
+            <!-- Text overlays -->
+            <div *ngFor="let textArea of certificate.textAreas" class="absolute text-center"
+                 [style.left.%]="(textArea.x - textArea.width/2) / certificate.template.width * 100"
+                 [style.top.%]="(textArea.y - textArea.height/2) / certificate.template.height * 100"
+                 [style.width.%]="textArea.width / certificate.template.width * 100"
+                 [style.height.%]="textArea.height / certificate.template.height * 100"
+                 [style.font-size.px]="textArea.fontSize * 0.3"
+                 [style.color]="textArea.color">
               
-              <!-- Background -->
-              <img [src]="certificate.template.imagePath" 
-                   [alt]="certificate.template.name"
-                   class="absolute inset-0 w-full h-full object-cover">
-  
-              <!-- Text overlays -->
-              <div *ngFor="let textArea of certificate.textAreas"
-                   class="absolute text-center"
-                   [style.left.%]="(textArea.x - textArea.width/2) / certificate.template.width * 100"
-                   [style.top.%]="(textArea.y - textArea.height/2) / certificate.template.height * 100"
-                   [style.width.%]="textArea.width / certificate.template.width * 100"
-                   [style.height.%]="textArea.height / certificate.template.height * 100"
-                   [style.font-family]="textArea.fontFamily"
-                   [style.font-size.px]="textArea.fontSize * 0.3"
-                   [style.font-weight]="textArea.fontWeight"
-                   [style.color]="textArea.color"
-                   [style.text-align]="textArea.textAlign">
-                
-                <div class="w-full h-full flex items-center justify-center">
-                  {{ getDisplayText(certificate, textArea) }}
-                </div>
+              <!-- الشعار فقط -->
+              <div *ngIf="textArea.id === 'logo' && institutionLogo" class="w-full h-full flex items-center justify-center">
+                <img [src]="institutionLogo" class="max-w-full max-h-full object-contain">
               </div>
-            </div>
-  
-            <!-- Selection indicator -->
-            <div *ngIf="selectedCertificates.has(certificate.id)"
-                 class="absolute top-2 right-2 bg-blue-500 text-white rounded-full p-1">
-              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-              </svg>
+              
+              <!-- النصوص العادية -->
+              <div *ngIf="textArea.id !== 'logo'" class="w-full h-full flex items-center justify-center">
+                {{ getDisplayText(certificate, textArea) }}
+              </div>
             </div>
           </div>
   
           <!-- Certificate Info -->
           <div class="p-4">
-            <h3 class="font-semibold text-gray-800 mb-1">{{ certificate.student.name || 'غير محدد' }}</h3>
+            <h3 class="font-semibold text-gray-800">{{ certificate.student.name }}</h3>
             <p class="text-sm text-gray-600">{{ certificate.template.name }}</p>
-            <div class="flex items-center justify-between mt-2">
-              <span class="text-xs text-gray-500">{{ formatDate(certificate.generatedAt) }}</span>
-              <button (click)="viewCertificate(certificate); $event.stopPropagation()"
-                      class="text-blue-500 hover:text-blue-700 text-sm">
-                عرض
-              </button>
-            </div>
           </div>
         </div>
       </div>
   
-      <!-- List View -->
-      <div *ngIf="viewMode === 'list' && filteredCertificates.length > 0" 
-           class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+      <!-- Export Panel -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">تصدير الشهادات</h2>
         
-        <div class="overflow-x-auto">
-          <table class="w-full">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <input type="checkbox" 
-                         [checked]="allSelected"
-                         [indeterminate]="someSelected"
-                         (change)="toggleAllSelection()"
-                         class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                </th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  اسم الطالب
-                </th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  القالب
-                </th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  تاريخ الإنشاء
-                </th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  إجراءات
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr *ngFor="let certificate of filteredCertificates; trackBy: trackByCertificateId"
-                  class="hover:bg-gray-50 transition-colors"
-                  [class.bg-blue-50]="selectedCertificates.has(certificate.id)">
-                
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <input type="checkbox" 
-                         [checked]="selectedCertificates.has(certificate.id)"
-                         (change)="toggleCertificateSelection(certificate.id)"
-                         class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                </td>
-                
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="flex-shrink-0 h-10 w-10">
-                      <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                        <span class="text-sm font-medium text-blue-800">
-                          {{ getInitials(certificate.student.name) }}
-                        </span>
-                      </div>
-                    </div>
-                    <div class="mr-4">
-                      <div class="text-sm font-medium text-gray-900">
-                        {{ certificate.student.name || 'غير محدد' }}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ certificate.template.name }}
-                </td>
-                
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ formatDate(certificate.generatedAt) }}
-                </td>
-                
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button (click)="viewCertificate(certificate)"
-                          class="text-blue-600 hover:text-blue-900 ml-2">
-                    عرض
-                  </button>
-                  <button (click)="duplicateCertificate(certificate)"
-                          class="text-green-600 hover:text-green-900 ml-2">
-                    نسخ
-                  </button>
-                  <button (click)="deleteCertificate(certificate.id)"
-                          class="text-red-600 hover:text-red-900">
-                    حذف
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-  
-      <!-- Single View -->
-      <div *ngIf="viewMode === 'single' && filteredCertificates.length > 0" class="mb-8">
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <!-- Navigation -->
-          <div class="flex items-center justify-between mb-6">
-            <h3 class="text-lg font-semibold text-gray-800">
-              {{ currentCertificate?.student?.name || 'غير محدد' }}
-            </h3>
-            
-            <div class="flex items-center space-x-4">
-              <button (click)="previousCertificate()"
-                      [disabled]="currentCertificateIndex === 0"
-                      class="px-3 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed">
-                السابق
-              </button>
-              
-              <span class="text-sm text-gray-600">
-                {{ currentCertificateIndex + 1 }} من {{ filteredCertificates.length }}
-              </span>
-              
-              <button (click)="nextCertificate()"
-                      [disabled]="currentCertificateIndex === filteredCertificates.length - 1"
-                      class="px-3 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed">
-                التالي
-              </button>
-            </div>
-          </div>
-  
-          <!-- Certificate Display -->
-          <div *ngIf="currentCertificate" class="text-center">
-            <div [id]="'certificate-single-' + currentCertificate.id" 
-                 class="certificate-display inline-block border rounded-lg overflow-hidden shadow-lg"
-                 [style.width.px]="displayWidth"
-                 [style.height.px]="displayHeight">
-              
-              <!-- Background -->
-              <div class="relative w-full h-full">
-                <img [src]="currentCertificate.template.imagePath" 
-                     [alt]="currentCertificate.template.name"
-                     class="absolute inset-0 w-full h-full object-cover">
-  
-                <!-- Text overlays -->
-                <div *ngFor="let textArea of currentCertificate.textAreas"
-                     class="absolute"
-                     [style.left.px]="(textArea.x - textArea.width/2) * displayScale"
-                     [style.top.px]="(textArea.y - textArea.height/2) * displayScale"
-                     [style.width.px]="textArea.width * displayScale"
-                     [style.height.px]="textArea.height * displayScale"
-                     [style.font-family]="textArea.fontFamily"
-                     [style.font-size.px]="textArea.fontSize * displayScale"
-                     [style.font-weight]="textArea.fontWeight"
-                     [style.color]="textArea.color"
-                     [style.text-align]="textArea.textAlign"
-                     [style.line-height]="(textArea.height / textArea.fontSize) * displayScale">
-                  
-                  <div class="w-full h-full flex items-center justify-center">
-                    {{ getDisplayText(currentCertificate, textArea) }}
-                  </div>
+        <!-- Export Settings -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <!-- Format Selection -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-3">تنسيق الملف</label>
+            <div class="space-y-2">
+              <div *ngFor="let format of availableFormats" 
+                   class="flex items-center p-3 border rounded-lg cursor-pointer"
+                   [class.border-blue-500]="exportSettings.format === format.value"
+                   [class.bg-blue-50]="exportSettings.format === format.value"
+                   (click)="setFormat(format.value)">
+                <input type="radio" [value]="format.value" [(ngModel)]="exportSettings.format" class="mr-3">
+                <div>
+                  <div class="font-medium">{{ format.name }}</div>
+                  <div class="text-sm text-gray-600">{{ format.description }}</div>
                 </div>
               </div>
             </div>
+          </div>
   
-            <!-- Zoom Controls -->
-            <div class="flex items-center justify-center mt-4 space-x-4">
-              <button (click)="zoomOut()"
-                      [disabled]="displayScale <= 0.2"
-                      class="px-3 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed">
-                تصغير
-              </button>
-              
-              <span class="text-sm text-gray-600">{{ (displayScale * 100).toFixed(0) }}%</span>
-              
-              <button (click)="zoomIn()"
-                      [disabled]="displayScale >= 2"
-                      class="px-3 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed">
-                تكبير
-              </button>
-              
-              <button (click)="resetZoom()"
-                      class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                إعادة تعيين
-              </button>
+          <!-- Quality Selection -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-3">جودة التصدير</label>
+            <div class="space-y-2">
+              <div *ngFor="let quality of availableQualities" 
+                   class="flex items-center p-3 border rounded-lg cursor-pointer"
+                   [class.border-blue-500]="exportSettings.quality === quality.value"
+                   [class.bg-blue-50]="exportSettings.quality === quality.value"
+                   (click)="setQuality(quality.value)">
+                <input type="radio" [value]="quality.value" [(ngModel)]="exportSettings.quality" class="mr-3">
+                <div>
+                  <div class="font-medium">{{ quality.name }}</div>
+                  <div class="text-sm text-gray-600">مقياس: {{ quality.scale }}x</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+  
+        <!-- Export Actions -->
+        <div class="flex gap-4">
+          <button (click)="exportAll()" 
+                  [disabled]="isExporting"
+                  class="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400">
+            تصدير جميع الشهادات
+          </button>
+          
+          <button (click)="exportSelected()" 
+                  [disabled]="isExporting || selectedCertificates.size === 0"
+                  class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400">
+            تصدير المحدد ({{ selectedCertificates.size }})
+          </button>
+        </div>
+  
+        <!-- Progress -->
+        <div *ngIf="isExporting" class="mt-4">
+          <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
+            <div class="bg-blue-600 h-4 rounded-full transition-all" [style.width.%]="exportProgress"></div>
+          </div>
+          <p class="text-sm text-gray-600 text-center">{{ exportStatus }} - {{ exportProgress }}%</p>
+        </div>
       </div>
   
-      <!-- Action Buttons -->
-      <div class="flex flex-wrap items-center justify-between gap-4">
-        <button (click)="goBack()"
-                class="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-400 transition-colors">
+      <!-- Navigation -->
+      <div class="flex justify-between items-center mt-8">
+        <button (click)="goBack()" class="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">
           السابق
         </button>
         
-        <div class="flex items-center space-x-2">
-          <span class="text-sm text-gray-600">
-            {{ selectedCertificates.size }} شهادة محددة
-          </span>
-          
-          <button (click)="continueToExport()"
-                  [disabled]="selectedCertificates.size === 0"
-                  class="px-8 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
-            تصدير المحدد
-          </button>
-        </div>
-      </div>
-  
-      <!-- Certificate Modal -->
-      <div *ngIf="showModal" 
-           class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-           (click)="closeModal()">
-        
-        <div class="bg-white rounded-lg max-w-4xl max-h-[90vh] overflow-auto"
-             (click)="$event.stopPropagation()">
-          
-          <div class="p-6">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-semibold text-gray-800">
-                شهادة {{ modalCertificate?.student?.name || 'غير محدد' }}
-              </h3>
-              <button (click)="closeModal()"
-                      class="text-gray-400 hover:text-gray-600">
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                </svg>
-              </button>
-            </div>
-  
-            <!-- Full Size Certificate -->
-            <div *ngIf="modalCertificate" class="text-center">
-              <div [id]="'certificate-modal-' + modalCertificate.id" 
-                   class="certificate-modal inline-block border rounded-lg overflow-hidden shadow-lg"
-                   [style.width.px]="modalCertificate.template.width"
-                   [style.height.px]="modalCertificate.template.height">
-                
-                <!-- Background -->
-                <div class="relative w-full h-full">
-                  <img [src]="modalCertificate.template.imagePath" 
-                       [alt]="modalCertificate.template.name"
-                       class="absolute inset-0 w-full h-full object-cover">
-  
-                  <!-- Text overlays -->
-                  <div *ngFor="let textArea of modalCertificate.textAreas"
-                       class="absolute"
-                       [style.left.px]="textArea.x - textArea.width/2"
-                       [style.top.px]="textArea.y - textArea.height/2"
-                       [style.width.px]="textArea.width"
-                       [style.height.px]="textArea.height"
-                       [style.font-family]="textArea.fontFamily"
-                       [style.font-size.px]="textArea.fontSize"
-                       [style.font-weight]="textArea.fontWeight"
-                       [style.color]="textArea.color"
-                       [style.text-align]="textArea.textAlign"
-                       [style.line-height]="textArea.height / textArea.fontSize">
-                    
-                    <div class="w-full h-full flex items-center justify-center">
-                      {{ getDisplayText(modalCertificate, textArea) }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <button (click)="startOver()" class="px-6 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">
+          بدء جديد
+        </button>
       </div>
     </div>
   </div>

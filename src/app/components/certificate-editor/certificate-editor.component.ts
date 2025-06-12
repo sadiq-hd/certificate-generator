@@ -29,6 +29,14 @@ interface ResizeState {
   direction: string;
 }
 
+// إضافة interface للنصوص المخصصة
+interface CustomTextItem {
+  id: string;
+  label: string;
+  value: string;
+  placeholder: string;
+}
+
 @Component({
   selector: 'app-certificate-editor',
   standalone: true,
@@ -52,6 +60,22 @@ export class CertificateEditorComponent implements OnInit, OnDestroy {
   availableFonts = AppSettings.fonts;
   institutionLogo: string | null = null;
   managerName: string = '';
+
+  // إضافة النصوص المخصصة
+  customTexts: CustomTextItem[] = [
+    { id: 'schoolName', label: 'اسم المدرسة', value: '', placeholder: 'أدخل اسم المدرسة' },
+    { id: 'principalTitle', label: 'منصب المدير', value: 'مدير المدرسة', placeholder: 'مدير المدرسة' },
+    { id: 'supervisorName', label: 'اسم المشرف', value: '', placeholder: 'أدخل اسم المشرف' },
+    { id: 'supervisorTitle', label: 'منصب المشرف', value: 'المشرف التربوي', placeholder: 'المشرف التربوي' },
+    { id: 'courseName', label: 'اسم الدورة', value: '', placeholder: 'أدخل اسم الدورة' },
+    { id: 'certificateNumber', label: 'رقم الشهادة', value: '', placeholder: 'رقم الشهادة' },
+    { id: 'issuePlace', label: 'مكان الإصدار', value: '', placeholder: 'مكان إصدار الشهادة' }
+  ];
+
+  // متغير لتتبع النص الجديد
+  newTextLabel: string = '';
+  newTextValue: string = '';
+  showAddTextDialog: boolean = false;
 
   // Drag and resize states
   private dragState: DragState = {
@@ -164,6 +188,126 @@ export class CertificateEditorComponent implements OnInit, OnDestroy {
     }
   }
 
+  // إضافة نص مخصص جديد
+  addCustomText(): void {
+    if (!this.newTextLabel.trim() || !this.selectedTemplate) return;
+
+    const newId = 'custom_' + Date.now();
+    const newTextArea: TextArea = {
+      id: newId,
+      label: this.newTextLabel,
+      x: this.selectedTemplate.width / 2,
+      y: this.selectedTemplate.height / 2,
+      width: 200,
+      height: 50,
+      fontSize: 20,
+      fontFamily: 'Arial',
+      fontWeight: 'normal',
+      color: '#000000',
+      textAlign: 'center',
+      isDraggable: true,
+      isResizable: true,
+      defaultText: this.newTextValue || this.newTextLabel
+    };
+
+    // إضافة النص المخصص إلى قائمة النصوص المخصصة
+    this.customTexts.push({
+      id: newId,
+      label: this.newTextLabel,
+      value: this.newTextValue || this.newTextLabel,
+      placeholder: this.newTextLabel
+    });
+
+    this.textAreas.push(newTextArea);
+    this.saveChanges();
+    
+    // إعادة تعيين القيم
+    this.newTextLabel = '';
+    this.newTextValue = '';
+    this.showAddTextDialog = false;
+    
+    // تحديد النص الجديد
+    this.selectTextArea(newId);
+  }
+
+  // إضافة نص مخصص من القائمة المحددة مسبقاً
+  addPredefinedText(customText: CustomTextItem): void {
+    if (!this.selectedTemplate) return;
+
+    const newTextArea: TextArea = {
+      id: customText.id,
+      label: customText.label,
+      x: this.selectedTemplate.width / 2,
+      y: this.selectedTemplate.height / 2,
+      width: 200,
+      height: 50,
+      fontSize: 18,
+      fontFamily: 'Arial',
+      fontWeight: 'normal',
+      color: '#000000',
+      textAlign: 'center',
+      isDraggable: true,
+      isResizable: true,
+      defaultText: customText.value || customText.placeholder
+    };
+
+    this.textAreas.push(newTextArea);
+    this.saveChanges();
+    this.selectTextArea(customText.id);
+  }
+
+  // حذف نص مخصص
+  removeCustomText(textAreaId: string): void {
+    this.textAreas = this.textAreas.filter(area => area.id !== textAreaId);
+    
+    // إزالة من قائمة النصوص المخصصة إذا كان نص مخصص
+    if (textAreaId.startsWith('custom_')) {
+      this.customTexts = this.customTexts.filter(text => text.id !== textAreaId);
+    }
+    
+    if (this.selectedTextAreaId === textAreaId) {
+      this.selectedTextAreaId = null;
+      this.selectedTextArea = null;
+    }
+    
+    this.saveChanges();
+  }
+
+  // تحديث قيمة النص المخصص
+  updateCustomTextValue(customTextId: string, value: string): void {
+    const customText = this.customTexts.find(text => text.id === customTextId);
+    if (customText) {
+      customText.value = value;
+      
+      // تحديث النص في منطقة النص أيضاً
+      const textArea = this.textAreas.find(area => area.id === customTextId);
+      if (textArea) {
+        textArea.defaultText = value;
+        this.saveChanges();
+      }
+    }
+  }
+
+  isCustomTextArea(textAreaId: string): boolean {
+    // تحقق مما إذا كان النص المخصص في القائمة
+    return this.customTexts.some(text => text.id === textAreaId);
+}
+
+isSpecialTextArea(textAreaId: string): boolean {
+    // تحقق من خصائص النص الخاصة
+    return textAreaId === 'logo'; // أو أي شرط آخر حسب التصميم
+}
+
+  // التحقق من وجود نص مخصص في القالب
+  isCustomTextInTemplate(customTextId: string): boolean {
+    return this.textAreas.some(area => area.id === customTextId);
+  }
+
+  // الحصول على النصوص المخصصة المتاحة للإضافة
+  getAvailableCustomTexts(): CustomTextItem[] {
+    return this.customTexts.filter(text => !this.isCustomTextInTemplate(text.id));
+  }
+
   // Text Area Management
   selectTextArea(textAreaId: string): void {
     this.selectedTextAreaId = textAreaId;
@@ -213,6 +357,12 @@ export class CertificateEditorComponent implements OnInit, OnDestroy {
 
   getDisplayText(textArea: TextArea): string {
     const currentStudent = this.students[this.currentStudentIndex];
+    
+    // التحقق من النصوص المخصصة أولاً
+    const customText = this.customTexts.find(text => text.id === textArea.id);
+    if (customText) {
+      return customText.value || textArea.defaultText;
+    }
     
     switch (textArea.id) {
       case 'name':
@@ -273,28 +423,29 @@ export class CertificateEditorComponent implements OnInit, OnDestroy {
   // Zoom Controls
   zoomIn(): void {
     if (this.zoomLevel < 2) {
-      this.zoomLevel = Math.min(2, this.zoomLevel + 0.1);
-      this.updateCanvasSize();
+        this.zoomLevel = Math.min(2, this.zoomLevel + 0.1);
+        this.updateCanvasSize(); // تحديث حجم اللوحة
     }
-  }
+}
 
-  zoomOut(): void {
+zoomOut(): void {
     if (this.zoomLevel > 0.2) {
-      this.zoomLevel = Math.max(0.2, this.zoomLevel - 0.1);
-      this.updateCanvasSize();
+        this.zoomLevel = Math.max(0.2, this.zoomLevel - 0.1);
+        this.updateCanvasSize(); // تحديث حجم اللوحة
     }
-  }
+}
 
   resetZoom(): void {
     this.calculateCanvasSize();
   }
 
+
   private updateCanvasSize(): void {
     if (this.selectedTemplate) {
-      this.canvasWidth = this.selectedTemplate.width * this.zoomLevel;
-      this.canvasHeight = this.selectedTemplate.height * this.zoomLevel;
+        this.canvasWidth = this.selectedTemplate.width * this.zoomLevel;
+        this.canvasHeight = this.selectedTemplate.height * this.zoomLevel;
     }
-  }
+}
 
   // Drag and Drop
   startDrag(event: MouseEvent, textAreaId: string): void {
@@ -512,7 +663,12 @@ export class CertificateEditorComponent implements OnInit, OnDestroy {
 
     // Delete selected text area
     if (event.key === 'Delete' && this.selectedTextArea) {
-      this.toggleTextAreaVisibility(this.selectedTextArea.id);
+      if (this.selectedTextArea.id.startsWith('custom_') || 
+          this.customTexts.some(text => text.id === this.selectedTextArea!.id)) {
+        this.removeCustomText(this.selectedTextArea.id);
+      } else {
+        this.toggleTextAreaVisibility(this.selectedTextArea.id);
+      }
       event.preventDefault();
     }
 

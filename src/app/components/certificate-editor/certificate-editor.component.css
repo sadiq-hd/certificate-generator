@@ -1,11 +1,8 @@
-/* CSS ضروري فقط - ما يقدر يتعمل بـ Tailwind */
-
 :host {
     display: block;
     direction: rtl;
   }
   
-  /* Text area improvements for multi-line */
   .text-area-content {
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -15,42 +12,11 @@
     white-space: pre-wrap;
   }
   
-  /* Resize handles - ما يقدر يتعمل بـ Tailwind */
-  .resize-handle {
-    @apply absolute w-2 h-2 bg-blue-500 border border-white rounded-full cursor-pointer z-10;
-  }
-  
-  .resize-handle-nw {
-    top: -4px;
-    left: -4px;
-    cursor: nw-resize;
-  }
-  
-  .resize-handle-ne {
-    top: -4px;
-    right: -4px;
-    cursor: ne-resize;
-  }
-  
-  .resize-handle-sw {
-    bottom: -4px;
-    left: -4px;
-    cursor: sw-resize;
-  }
-  
-  .resize-handle-se {
-    bottom: -4px;
-    right: -4px;
-    cursor: se-resize;
-  }
-  
-  /* Drag state */
   .dragging {
     cursor: grabbing !important;
-    @apply z-20;
+    z-index: 50;
   }
   
-  /* Selection animation */
   .selected {
     animation: pulse 2s infinite;
   }
