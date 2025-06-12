@@ -1,1 +1,320 @@
 <p>export-panel works!</p>
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">تصدير الشهادات</h1>
+        <p class="text-lg text-gray-600">اختر إعدادات التصدير وحمل الشهادات</p>
+      </div>
+  
+      <!-- Progress Bar -->
+      <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
+        <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+             style="width: 100%"></div>
+      </div>
+  
+      <!-- Export Summary -->
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">ملخص التصدير</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="text-center p-4 bg-blue-50 rounded-lg">
+            <div class="text-2xl font-bold text-blue-600">{{ certificates.length }}</div>
+            <div class="text-sm text-gray-600">عدد الشهادات</div>
+          </div>
+          
+          <div class="text-center p-4 bg-green-50 rounded-lg">
+            <div class="text-2xl font-bold text-green-600">{{ selectedTemplate?.name || 'غير محدد' }}</div>
+            <div class="text-sm text-gray-600">القالب المستخدم</div>
+          </div>
+          
+          <div class="text-center p-4 bg-purple-50 rounded-lg">
+            <div class="text-2xl font-bold text-purple-600">{{ getEstimatedSize() }}</div>
+            <div class="text-sm text-gray-600">الحجم المتوقع</div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Export Settings -->
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-6">إعدادات التصدير</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Format Selection -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-3">تنسيق الملف</label>
+            <div class="space-y-2">
+              <div *ngFor="let format of availableFormats" 
+                   class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors"
+                   [class.border-blue-500]="exportSettings.format === format.value"
+                   [class.bg-blue-50]="exportSettings.format === format.value"
+                   [class.border-gray-200]="exportSettings.format !== format.value"
+                   (click)="setFormat(format.value)">
+                
+                <input type="radio" 
+                       [value]="format.value"
+                       [(ngModel)]="exportSettings.format"
+                       [id]="'format-' + format.value"
+                       class="mr-3 text-blue-600 focus:ring-blue-500">
+                
+                <div class="flex-1">
+                  <label [for]="'format-' + format.value" class="font-medium text-gray-800 cursor-pointer">
+                    {{ format.name }}
+                  </label>
+                  <p class="text-sm text-gray-600">{{ format.description }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Quality Selection -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-3">جودة التصدير</label>
+            <div class="space-y-2">
+              <div *ngFor="let quality of availableQualities" 
+                   class="flex items-center p-3 border rounded-lg cursor-pointer transition-colors"
+                   [class.border-blue-500]="exportSettings.quality === quality.value"
+                   [class.bg-blue-50]="exportSettings.quality === quality.value"
+                   [class.border-gray-200]="exportSettings.quality !== quality.value"
+                   (click)="setQuality(quality.value)">
+                
+                <input type="radio" 
+                       [value]="quality.value"
+                       [(ngModel)]="exportSettings.quality"
+                       [id]="'quality-' + quality.value"
+                       class="mr-3 text-blue-600 focus:ring-blue-500">
+                
+                <div class="flex-1">
+                  <label [for]="'quality-' + quality.value" class="font-medium text-gray-800 cursor-pointer">
+                    {{ quality.name }}
+                  </label>
+                  <p class="text-sm text-gray-600">مقياس: {{ quality.scale }}x</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Advanced Settings -->
+        <div class="mt-6 pt-6 border-t border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">إعدادات متقدمة</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Background Color -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">لون الخلفية</label>
+              <div class="flex items-center space-x-2">
+                <input type="color" 
+                       [(ngModel)]="exportSettings.backgroundColor"
+                       class="w-12 h-10 border border-gray-300 rounded cursor-pointer">
+                <input type="text" 
+                       [(ngModel)]="exportSettings.backgroundColor"
+                       placeholder="#ffffff"
+                       class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+              </div>
+            </div>
+  
+            <!-- Custom Scale -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                مقياس مخصص ({{ exportSettings.scale }}x)
+              </label>
+              <input type="range" 
+                     [(ngModel)]="exportSettings.scale"
+                     min="0.5" 
+                     max="5" 
+                     step="0.1"
+                     class="w-full">
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Preview -->
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">معاينة التصدير</h2>
+        
+        <div *ngIf="certificates.length > 0" class="text-center">
+          <div class="inline-block border-2 border-gray-200 rounded-lg overflow-hidden">
+            <div [id]="'export-preview-' + previewCertificate?.id" 
+                 class="export-preview relative"
+                 [style.width.px]="previewWidth"
+                 [style.height.px]="previewHeight">
+              
+              <!-- Background -->
+              <img *ngIf="previewCertificate" 
+                   [src]="previewCertificate.template.imagePath" 
+                   [alt]="previewCertificate.template.name"
+                   class="absolute inset-0 w-full h-full object-cover">
+  
+              <!-- Text overlays -->
+              <div *ngFor="let textArea of previewCertificate?.textAreas"
+                   class="absolute"
+                   [style.left.px]="(textArea.x - textArea.width/2) * previewScale"
+                   [style.top.px]="(textArea.y - textArea.height/2) * previewScale"
+                   [style.width.px]="textArea.width * previewScale"
+                   [style.height.px]="textArea.height * previewScale"
+                   [style.font-family]="textArea.fontFamily"
+                   [style.font-size.px]="textArea.fontSize * previewScale"
+                   [style.font-weight]="textArea.fontWeight"
+                   [style.color]="textArea.color"
+                   [style.text-align]="textArea.textAlign"
+                   [style.line-height]="(textArea.height / textArea.fontSize) * previewScale">
+                
+                <div class="w-full h-full flex items-center justify-center">
+                  {{ getDisplayText(previewCertificate!, textArea) }}
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Preview Navigation -->
+          <div *ngIf="certificates.length > 1" class="flex items-center justify-center mt-4 space-x-4">
+            <button (click)="previousPreview()"
+                    [disabled]="previewIndex === 0"
+                    class="px-3 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed">
+              السابق
+            </button>
+            
+            <span class="text-sm text-gray-600">
+              {{ previewIndex + 1 }} من {{ certificates.length }}
+            </span>
+            
+            <button (click)="nextPreview()"
+                    [disabled]="previewIndex === certificates.length - 1"
+                    class="px-3 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed">
+              التالي
+            </button>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Export Actions -->
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">إجراءات التصدير</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Single Export -->
+          <div class="p-4 border border-gray-200 rounded-lg">
+            <h3 class="font-semibold text-gray-800 mb-2">تصدير فردي</h3>
+            <p class="text-sm text-gray-600 mb-4">تصدير شهادة واحدة في كل مرة</p>
+            
+            <div class="space-y-2">
+              <select [(ngModel)]="selectedCertificateId" 
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">اختر شهادة...</option>
+                <option *ngFor="let cert of certificates" [value]="cert.id">
+                  {{ cert.student.name }}
+                </option>
+              </select>
+              
+              <button (click)="exportSingle()"
+                      [disabled]="!selectedCertificateId || isExporting"
+                      class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
+                تصدير
+              </button>
+            </div>
+          </div>
+  
+          <!-- Bulk Export -->
+          <div class="p-4 border border-gray-200 rounded-lg">
+            <h3 class="font-semibold text-gray-800 mb-2">تصدير جماعي</h3>
+            <p class="text-sm text-gray-600 mb-4">تصدير جميع الشهادات في ملف مضغوط</p>
+            
+            <button (click)="exportAll()"
+                    [disabled]="certificates.length === 0 || isExporting"
+                    class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
+              تصدير الكل
+            </button>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Progress -->
+      <div *ngIf="isExporting" class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">جاري التصدير...</h2>
+        
+        <div class="space-y-4">
+          <div class="w-full bg-gray-200 rounded-full h-4">
+            <div class="bg-blue-600 h-4 rounded-full transition-all duration-300" 
+                 [style.width.%]="exportProgress"></div>
+          </div>
+          
+          <div class="flex justify-between items-center text-sm text-gray-600">
+            <span>{{ exportStatus }}</span>
+            <span>{{ exportProgress }}%</span>
+          </div>
+          
+          <div *ngIf="exportProgress === 100" class="text-center">
+            <div class="text-green-600 mb-2">
+              <svg class="w-8 h-8 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <p class="text-green-600 font-medium">تم التصدير بنجاح!</p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Action Buttons -->
+      <div class="flex justify-between items-center">
+        <button (click)="goBack()"
+                [disabled]="isExporting"
+                class="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+          السابق
+        </button>
+        
+        <div class="flex items-center space-x-4">
+          <button (click)="startOver()"
+                  [disabled]="isExporting"
+                  class="px-6 py-3 bg-yellow-500 text-white rounded-lg font-medium hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            بدء جديد
+          </button>
+          
+          <button (click)="saveProject()"
+                  [disabled]="isExporting"
+                  class="px-6 py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            حفظ المشروع
+          </button>
+        </div>
+      </div>
+  
+      <!-- Hidden Certificate Elements for Export -->
+      <div class="hidden">
+        <div *ngFor="let certificate of certificates"
+             [id]="'certificate-' + certificate.id"
+             class="certificate-export"
+             [style.width.px]="certificate.template.width"
+             [style.height.px]="certificate.template.height"
+             [style.position]="'relative'">
+          
+          <!-- Background -->
+          <img [src]="certificate.template.imagePath" 
+               [alt]="certificate.template.name"
+               [style.width.px]="certificate.template.width"
+               [style.height.px]="certificate.template.height"
+               style="position: absolute; top: 0; left: 0;">
+  
+          <!-- Text overlays -->
+          <div *ngFor="let textArea of certificate.textAreas"
+               [style.position]="'absolute'"
+               [style.left.px]="textArea.x - textArea.width/2"
+               [style.top.px]="textArea.y - textArea.height/2"
+               [style.width.px]="textArea.width"
+               [style.height.px]="textArea.height"
+               [style.font-family]="textArea.fontFamily"
+               [style.font-size.px]="textArea.fontSize"
+               [style.font-weight]="textArea.fontWeight"
+               [style.color]="textArea.color"
+               [style.text-align]="textArea.textAlign"
+               [style.line-height]="textArea.height / textArea.fontSize"
+               [style.display]="'flex'"
+               [style.align-items]="'center'"
+               [style.justify-content]="'center'">
+            
+            {{ getDisplayText(certificate, textArea) }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

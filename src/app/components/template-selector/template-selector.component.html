@@ -1,1 +1,93 @@
 <p>template-selector works!</p>
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-8">
+    <div class="max-w-6xl mx-auto">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">اختر قالب الشهادة</h1>
+        <p class="text-lg text-gray-600">اختر التصميم المناسب لشهاداتك</p>
+      </div>
+  
+      <!-- Progress Bar -->
+      <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
+        <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+             style="width: 20%"></div>
+      </div>
+  
+      <!-- Templates Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div *ngFor="let template of templates; trackBy: trackByTemplateId"
+             class="bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl cursor-pointer border-2"
+             [class.border-blue-500]="selectedTemplate?.id === template.id"
+             [class.border-gray-200]="selectedTemplate?.id !== template.id"
+             (click)="selectTemplate(template)">
+          
+          <!-- Template Image -->
+          <div class="relative h-48 bg-gray-100">
+            <img 
+              [src]="template.thumbnail || template.imagePath" 
+              [alt]="template.name"
+              class="w-full h-full object-cover"
+              (error)="onImageError($event)"
+              loading="lazy">
+            
+            <!-- Selection Indicator -->
+            <div *ngIf="selectedTemplate?.id === template.id"
+                 class="absolute top-3 right-3 bg-blue-500 text-white rounded-full p-2">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+          </div>
+  
+          <!-- Template Info -->
+          <div class="p-4">
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ template.name }}</h3>
+            <p class="text-sm text-gray-600 mb-3">{{ template.description }}</p>
+            
+            <!-- Template Details -->
+            <div class="flex justify-between items-center text-xs text-gray-500">
+              <span>{{ template.width }} × {{ template.height }}</span>
+              <span>{{ template.textAreas.length }} منطقة نص</span>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- No Templates Message -->
+      <div *ngIf="templates.length === 0" 
+           class="text-center py-12">
+        <div class="text-gray-400 mb-4">
+          <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm1 0v12h12V4H4z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-600 mb-2">لا توجد قوالب متاحة</h3>
+        <p class="text-gray-500">يرجى إضافة ملفات القوالب إلى مجلد assets/templates</p>
+      </div>
+  
+      <!-- Action Buttons -->
+      <div class="flex justify-between items-center">
+        <button 
+          (click)="goBack()"
+          class="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-400 transition-colors">
+          السابق
+        </button>
+        
+        <button 
+          (click)="continueToNext()"
+          [disabled]="!selectedTemplate"
+          class="px-8 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
+          التالي
+        </button>
+      </div>
+  
+      <!-- Loading State -->
+      <div *ngIf="isLoading" 
+           class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 flex items-center space-x-4">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <span class="text-gray-700">جاري تحميل القوالب...</span>
+        </div>
+      </div>
+    </div>
+  </div>

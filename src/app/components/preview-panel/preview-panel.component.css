@@ -1,0 +1,142 @@
+:host {
+    display: block;
+    direction: rtl;
+  }
+  
+  .certificate-preview {
+    transform-origin: top left;
+    scale: 0.3;
+  }
+  
+  .certificate-display {
+    transform-origin: center center;
+    max-width: 100%;
+    max-height: 70vh;
+  }
+  
+  .certificate-modal {
+    max-width: 90vw;
+    max-height: 70vh;
+    transform-origin: center center;
+  }
+  
+  .grid-item {
+    transition: all 0.3s ease;
+  }
+  
+  .grid-item:hover {
+    transform: translateY(-2px);
+  }
+  
+  .selected-item {
+    transform: scale(1.02);
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+  }
+  
+  .table-row {
+    transition: background-color 0.2s ease;
+  }
+  
+  .zoom-controls {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(4px);
+  }
+  
+  /* Modal animations */
+  .modal-enter {
+    animation: modalEnter 0.3s ease-out;
+  }
+  
+  .modal-leave {
+    animation: modalLeave 0.2s ease-in;
+  }
+  
+  @keyframes modalEnter {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes modalLeave {
+    from {
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+  }
+  
+  /* Selection animations */
+  .selection-animation {
+    animation: selectionPulse 0.5s ease-out;
+  }
+  
+  @keyframes selectionPulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  
+  /* Custom scrollbar */
+  .overflow-auto::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .overflow-auto::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  .overflow-auto::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+  }
+  
+  .overflow-auto::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .certificate-display {
+      max-width: 90vw;
+      max-height: 50vh;
+    }
+    
+    .certificate-modal {
+      max-width: 95vw;
+      max-height: 60vh;
+    }
+  }
+  
+  /* Loading states */
+  .loading-skeleton {
+    animation: skeleton 1.5s ease-in-out infinite alternate;
+  }
+  
+  @keyframes skeleton {
+    0% {
+      background-color: #f0f0f0;
+    }
+    100% {
+      background-color: #e0e0e0;
+    }
+  }

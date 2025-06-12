@@ -1,1 +1,311 @@
-<p>data-input works!</p>
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">إدخال البيانات</h1>
+        <p class="text-lg text-gray-600">أضف أسماء الطلاب والمعلومات الأساسية</p>
+      </div>
+  
+      <!-- Progress Bar -->
+      <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
+        <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+             style="width: 40%"></div>
+      </div>
+  
+      <!-- Selected Template Info -->
+      <div *ngIf="selectedTemplate" class="bg-white rounded-lg shadow-md p-4 mb-6">
+        <div class="flex items-center space-x-4">
+          <img [src]="selectedTemplate.thumbnail || selectedTemplate.imagePath" 
+               [alt]="selectedTemplate.name"
+               class="w-16 h-12 object-cover rounded">
+          <div>
+            <h3 class="font-semibold text-gray-800">{{ selectedTemplate.name }}</h3>
+            <p class="text-sm text-gray-600">{{ selectedTemplate.description }}</p>
+          </div>
+        </div>
+      </div>
+  
+      <div class="space-y-8">
+        <!-- Students Data Section -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">بيانات الطلاب</h2>
+          
+          <!-- Upload Methods -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <!-- Excel Upload -->
+            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+              <input type="file" 
+                     #fileInput 
+                     (change)="onFileSelected($event)"
+                     accept=".xlsx,.xls,.csv"
+                     class="hidden">
+              
+              <div class="space-y-4">
+                <div class="text-blue-500">
+                  <svg class="w-12 h-12 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2zM3 5a1 1 0 011-1h12a1 1 0 011 1v8a1 1 0 01-1 1H4a1 1 0 01-1-1V5z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800">رفع ملف Excel</h3>
+                <p class="text-sm text-gray-600">ارفع ملف Excel أو CSV يحتوي على أسماء الطلاب</p>
+                <button (click)="fileInput.click()"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                  اختر ملف
+                </button>
+                <div class="mt-2">
+                  <button (click)="downloadSample()"
+                          class="text-sm text-blue-600 hover:underline">
+                    تحميل ملف نموذجي
+                  </button>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Manual Input -->
+            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6">
+              <div class="space-y-4">
+                <div class="text-green-500">
+                  <svg class="w-12 h-12 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.828-2.828z"></path>
+                  </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800">إدخال يدوي</h3>
+                <p class="text-sm text-gray-600">أضف أسماء الطلاب واحداً تلو الآخر</p>
+                <button (click)="showManualInput = true"
+                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                  بدء الإدخال
+                </button>
+              </div>
+            </div>
+          </div>
+  
+          <!-- File Upload Status -->
+          <div *ngIf="uploadStatus" class="mb-4 p-4 rounded-lg"
+               [class.bg-green-100]="uploadStatus.type === 'success'"
+               [class.bg-red-100]="uploadStatus.type === 'error'"
+               [class.bg-blue-100]="uploadStatus.type === 'info'">
+            <p [class.text-green-700]="uploadStatus.type === 'success'"
+               [class.text-red-700]="uploadStatus.type === 'error'"
+               [class.text-blue-700]="uploadStatus.type === 'info'">
+              {{ uploadStatus.message }}
+            </p>
+          </div>
+  
+          <!-- Manual Input Form -->
+          <div *ngIf="showManualInput" class="border rounded-lg p-4 mb-4">
+            <h4 class="font-semibold mb-4">إضافة طالب جديد</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input type="text" 
+                     [(ngModel)]="newStudentName"
+                     placeholder="اسم الطالب"
+                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+              
+              <div class="flex gap-2">
+                <button (click)="addStudent()"
+                        [disabled]="!newStudentName.trim()"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors">
+                  إضافة
+                </button>
+                <button (click)="showManualInput = false"
+                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+                  إلغاء
+                </button>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Students List -->
+          <div *ngIf="students.length > 0" class="space-y-2">
+            <h4 class="font-semibold text-gray-800">قائمة الطلاب ({{ students.length }})</h4>
+            <div class="max-h-60 overflow-y-auto border rounded-lg">
+              <div *ngFor="let student of students; let i = index" 
+                   class="flex items-center justify-between p-3 border-b last:border-b-0 hover:bg-gray-50">
+                <div class="flex items-center space-x-3">
+                  <span class="text-sm text-gray-500">{{ i + 1 }}</span>
+                  <span class="font-medium">{{ student.name }}</span>
+                  <span *ngIf="student.image" class="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
+                    صورة ✓
+                  </span>
+                </div>
+                <button (click)="removeStudent(student.id)"
+                        class="text-red-500 hover:text-red-700 transition-colors">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Certificate Text Section -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">نص الشهادة</h2>
+          
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                النص الرئيسي للشهادة
+              </label>
+              <textarea [(ngModel)]="customText"
+                        rows="4"
+                        placeholder="اكتب النص الذي سيظهر في الشهادة..."
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            </div>
+  
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- اسم المدير -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  اسم المدير/المسؤول
+                </label>
+                <input type="text" 
+                       [(ngModel)]="managerName"
+                       placeholder="اسم المدير"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+              </div>
+  
+              <!-- شعار المؤسسة -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  شعار المؤسسة (اختياري)
+                </label>
+                
+                <!-- إذا مافيه شعار -->
+                <div *ngIf="!institutionLogo">
+                  <input type="file" 
+                         (change)="onLogoSelected($event)"
+                         accept="image/*"
+                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <!-- إذا فيه شعار -->
+                <div *ngIf="institutionLogo" class="space-y-2">
+                  <div class="flex items-center space-x-2 p-2 border rounded-lg bg-gray-50">
+                    <img [src]="institutionLogo" alt="الشعار" class="w-12 h-12 object-contain border rounded">
+                    <div class="flex-1">
+                      <p class="text-sm text-gray-600">{{ logoFileName }}</p>
+                      <button (click)="removeLogo()" 
+                              class="text-red-500 hover:text-red-700 text-sm transition-colors">
+                        حذف الشعار
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Images Upload Section -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">صور الطلاب (اختياري)</h2>
+          
+          <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-400 transition-colors">
+            <input type="file" 
+                   #imagesInput
+                   (change)="onImagesSelected($event)"
+                   accept="image/*"
+                   multiple
+                   class="hidden">
+            
+            <div class="space-y-4">
+              <div class="text-purple-500">
+                <svg class="w-12 h-12 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800">رفع صور الطلاب</h3>
+              <p class="text-sm text-gray-600">ارفع صور الطلاب لإضافتها للشهادات (يجب أن تكون أسماء الملفات مطابقة لأسماء الطلاب)</p>
+              <button (click)="imagesInput.click()"
+                      class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                اختر الصور
+              </button>
+              
+              <!-- نصائح للمطابقة -->
+              <div class="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p class="text-xs text-yellow-800">
+                  💡 نصيحة: أسماء الملفات يجب أن تحتوي على أسماء الطلاب (مثال: احمد.jpg، فاطمة.png)
+                </p>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Uploaded Images -->
+          <div *ngIf="uploadedImages.length > 0" class="mt-6">
+            <h4 class="font-semibold mb-3 text-gray-800">الصور المرفوعة ({{ uploadedImages.length }})</h4>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              <div *ngFor="let image of uploadedImages" class="relative group">
+                <img [src]="image.url" 
+                     [alt]="image.name" 
+                     class="w-full h-20 object-cover rounded border shadow-sm hover:shadow-md transition-shadow">
+                
+                <!-- اسم الملف -->
+                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-1 rounded-b truncate">
+                  {{ image.name }}
+                </div>
+                
+                <!-- زر الحذف -->
+                <button (click)="removeImage(image.name)"
+                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100">
+                  ×
+                </button>
+                
+                <!-- مؤشر المطابقة -->
+                <div *ngIf="isImageMatched(image.name)" 
+                     class="absolute top-1 left-1 bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                  ✓
+                </div>
+              </div>
+            </div>
+            
+            <!-- إحصائيات المطابقة -->
+            <div class="mt-3 flex items-center justify-between text-sm text-gray-600">
+              <span>{{ getMatchedImagesCount() }} من {{ uploadedImages.length }} صورة تم ربطها بالطلاب</span>
+              <button (click)="showImageMatching = !showImageMatching"
+                      class="text-blue-600 hover:text-blue-700 transition-colors">
+                {{ showImageMatching ? 'إخفاء' : 'عرض' }} تفاصيل الربط
+              </button>
+            </div>
+            
+            <!-- تفاصيل ربط الصور -->
+            <div *ngIf="showImageMatching" class="mt-3 p-3 bg-gray-50 rounded-lg">
+              <h5 class="font-medium text-gray-800 mb-2">تفاصيل ربط الصور:</h5>
+              <div class="space-y-1 text-sm">
+                <div *ngFor="let student of students" class="flex items-center justify-between">
+                  <span>{{ student.name }}</span>
+                  <span [class.text-green-600]="student.image" 
+                        [class.text-gray-400]="!student.image">
+                    {{ student.image ? '✓ مربوطة' : '○ غير مربوطة' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Action Buttons -->
+      <div class="flex justify-between items-center mt-8">
+        <button (click)="goBack()"
+                class="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-400 transition-colors">
+          السابق
+        </button>
+        
+        <button (click)="continueToNext()"
+                [disabled]="students.length === 0 || !customText.trim()"
+                class="px-8 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
+          التالي
+        </button>
+      </div>
+  
+      <!-- Loading Overlay -->
+      <div *ngIf="isLoading" 
+           class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 flex items-center space-x-4">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <span class="text-gray-700">{{ loadingMessage }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
