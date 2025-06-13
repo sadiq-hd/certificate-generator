@@ -1,62 +1,259 @@
 @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap');
+/* ============================================
+   ADDITIONAL STYLES FOR TAILWIND CONFIG
+   ستايلز إضافية تكمل تكوين Tailwind
+   ============================================ */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-/* استيراد الخطوط العربية من Google Fonts */
-
-/* إعدادات عامة للعربية */
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: 'Noto Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif;
-  direction: rtl;
-  text-align: right;
-}
-
-.ltr {
-  direction: ltr;
-  text-align: left;
-}
-
-/* كلاسات مخصصة للشهادات */
-.draggable-text {
-  cursor: move;
-  user-select: none;
-  position: absolute;
-  z-index: 10;
-  padding: 4px 8px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.draggable-text:hover {
-  outline: 2px dashed #3b82f6;
-  background-color: rgba(59, 130, 246, 0.1);
-}
-
-.certificate-canvas {
-  position: relative;
-  overflow: visible;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  background: white;
-}
-
-.template-card {
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.template-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-}
-
-.template-card.selected {
-  ring: 2px solid #3b82f6;
-  ring-offset: 2px;
-}
+   @tailwind base;
+   @tailwind components;
+   @tailwind utilities;
+   
+   /* ========== LAYER UTILITIES ========== */
+   @layer utilities {
+     /* إضافات مفيدة للمشروع */
+     
+     /* تأثيرات إضافية للنصوص */
+     .text-glow {
+       text-shadow: 0 0 10px currentColor;
+     }
+     
+     /* خلفيات متحركة */
+     .bg-animated-gradient {
+       background: linear-gradient(-45deg, #ee7724, #d8363a, #dd3675, #b44593);
+       background-size: 400% 400%;
+       animation: gradientShift 15s ease infinite;
+     }
+     
+     /* تأثير الكتابة */
+     .typing-effect::after {
+       content: '|';
+       animation: blink 1s infinite;
+     }
+     
+     /* تأثير البريق */
+     .shimmer {
+       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+       animation: shimmer 2s infinite;
+     }
+     
+     /* انتقالات مخصصة للموبايل */
+     @media (max-width: 768px) {
+       .mobile-smooth {
+         transition: all 0.2s ease !important;
+       }
+       
+       .mobile-no-transform:hover {
+         transform: none !important;
+       }
+     }
+     
+     /* دعم إضافي للـ RTL */
+     .rtl-margin {
+       margin-inline-start: auto;
+       margin-inline-end: 0;
+     }
+     
+     .ltr-margin {
+       margin-inline-start: 0;
+       margin-inline-end: auto;
+     }
+   }
+   
+   /* ========== KEYFRAMES إضافية ========== */
+   @keyframes gradientShift {
+     0% { background-position: 0% 50%; }
+     50% { background-position: 100% 50%; }
+     100% { background-position: 0% 50%; }
+   }
+   
+   @keyframes blink {
+     0%, 50% { opacity: 1; }
+     51%, 100% { opacity: 0; }
+   }
+   
+   @keyframes shimmer {
+     0% { transform: translateX(-100%); }
+     100% { transform: translateX(100%); }
+   }
+   
+   /* ========== LAYER COMPONENTS ========== */
+   @layer components {
+     /* مكونات إضافية مفيدة */
+     
+     /* بطاقة متقدمة */
+     .advanced-card {
+       @apply bg-white rounded-3xl shadow-certificate p-6 relative overflow-hidden;
+       @apply before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent;
+       @apply before:translate-x-[-100%] before:transition-transform before:duration-700;
+       @apply hover:before:translate-x-[100%] hover:shadow-template-hover hover:-translate-y-2;
+     }
+     
+     /* زر متقدم */
+     .advanced-btn {
+       @apply relative px-6 py-3 font-semibold rounded-2xl overflow-hidden;
+       @apply bg-gradient-to-r from-orange-500 to-orange-600;
+       @apply text-white transition-all duration-300;
+       @apply hover:from-orange-600 hover:to-orange-700;
+       @apply hover:-translate-y-1 hover:shadow-orange-glow;
+       @apply active:translate-y-0 active:scale-95;
+     }
+     
+     /* حقل إدخال متقدم */
+     .advanced-input {
+       @apply w-full px-4 py-3 rounded-xl border-2 border-gray-200;
+       @apply focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20;
+       @apply focus:outline-none focus:-translate-y-1;
+       @apply transition-all duration-300;
+       @apply placeholder:text-gray-400;
+     }
+     
+     /* رسالة نجاح */
+     .success-message {
+       @apply bg-green-50 border-l-4 border-green-400 p-4 rounded-lg;
+       @apply text-green-700 animate-slide-in-top;
+     }
+     
+     /* رسالة خطأ */
+     .error-message {
+       @apply bg-red-50 border-l-4 border-red-400 p-4 rounded-lg;
+       @apply text-red-700 animate-slide-in-top;
+     }
+     
+     /* شريط تحميل متقدم */
+     .advanced-progress {
+       @apply w-full h-3 bg-gray-200 rounded-full overflow-hidden;
+     }
+     
+     .advanced-progress-bar {
+       @apply h-full bg-gradient-to-r from-orange-500 to-orange-600;
+       @apply transition-all duration-500 ease-out;
+       @apply relative overflow-hidden;
+     }
+     
+     .advanced-progress-bar::after {
+       @apply content-[''] absolute top-0 left-0 w-full h-full;
+       @apply bg-gradient-to-r from-transparent via-white/30 to-transparent;
+       @apply animate-gradient-flow;
+     }
+   }
+   
+   /* ========== تحسينات الأداء ========== */
+   .gpu-accelerated {
+     transform: translateZ(0);
+     will-change: transform;
+   }
+   
+   /* ========== تحسينات إمكانية الوصول ========== */
+   .focus-visible {
+     @apply outline-2 outline-orange-500 outline-offset-2;
+   }
+   
+   @media (prefers-reduced-motion: reduce) {
+     .respect-motion-preference {
+       animation: none !important;
+       transition: none !important;
+     }
+   }
+   
+   /* ========== طباعة محسنة ========== */
+   @media print {
+     .print-hidden {
+       display: none !important;
+     }
+     
+     .print-visible {
+       display: block !important;
+     }
+     
+     /* إخفاء العناصر التفاعلية في الطباعة */
+     button, .btn-orange, .social-icon {
+       display: none !important;
+     }
+   }
+   
+   /* ========== تحسينات خاصة بالمتصفحات ========== */
+   /* Safari */
+   @supports (-webkit-backdrop-filter: blur(10px)) {
+     .safari-blur {
+       -webkit-backdrop-filter: blur(10px);
+     }
+   }
+   
+   /* Firefox */
+   @-moz-document url-prefix() {
+     .firefox-fix {
+       background-attachment: fixed;
+     }
+   }
+   
+   /* ========== متغيرات CSS مخصصة ========== */
+   :root {
+     --orange-primary: #f97316;
+     --orange-secondary: #ea580c;
+     --orange-dark: #c2410c;
+     --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+     --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+     --border-radius-card: 1.5rem;
+   }
+   
+   /* ========== Dark Mode Variables ========== */
+   @media (prefers-color-scheme: dark) {
+     :root {
+       --bg-primary: #1f2937;
+       --bg-secondary: #374151;
+       --text-primary: #f9fafb;
+       --text-secondary: #d1d5db;
+     }
+   }
+   
+   /* ========== استخدام المتغيرات ========== */
+   .custom-card {
+     background: var(--bg-primary, white);
+     color: var(--text-primary, black);
+     border-radius: var(--border-radius-card);
+     box-shadow: var(--shadow-soft);
+     transition: all 0.3s var(--transition-smooth);
+   }
+   
+   /* ========== تحسينات خاصة بالشهادات ========== */
+   .certificate-container {
+     /* تحسين دقة الطباعة */
+     print-color-adjust: exact;
+     -webkit-print-color-adjust: exact;
+     color-adjust: exact;
+   }
+   
+   .certificate-text {
+     /* منع تقطيع النص */
+     word-break: keep-all;
+     hyphens: none;
+     text-rendering: optimizeLegibility;
+   }
+   
+   /* ========== تحسينات الخطوط العربية ========== */
+   .arabic-text {
+     font-feature-settings: "liga" 1, "dlig" 1, "kern" 1;
+     text-rendering: optimizeLegibility;
+     -webkit-font-smoothing: antialiased;
+     -moz-osx-font-smoothing: grayscale;
+   }
+   
+   /* ========== تحسينات الأداء للرسوم المتحركة ========== */
+   .performance-optimized {
+     contain: layout style paint;
+     content-visibility: auto;
+   }
+   
+   /* ========== دعم الماوس والمس ========== */
+   @media (hover: hover) {
+     .hover-only:hover {
+       transform: translateY(-2px);
+     }
+   }
+   
+   @media (hover: none) {
+     .touch-device {
+       -webkit-tap-highlight-color: transparent;
+       touch-action: manipulation;
+     }
+   }

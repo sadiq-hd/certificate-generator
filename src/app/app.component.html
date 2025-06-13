@@ -1,9 +1,6 @@
 <!-- Header Component - Only show when in steps -->
-<app-header *ngIf="currentPage === 'steps' && currentStep > 0"
-  [showSaveButton]="currentStep > 1 && currentStep < 5"
-  [isSaving]="isSaving"
-  (saveClicked)="saveProject()">
-</app-header>
+<app-header ></app-header>
+
 
 <!-- Home Page - Show only when currentPage is home -->
 <app-home *ngIf="currentPage === 'home'" 
@@ -14,11 +11,11 @@
 
 
 <!-- App Container - Only show when in steps -->
-<div *ngIf="currentPage === 'steps' && currentStep > 0" class="app-container min-h-screen bg-gradient-to-br from-orange-50 to-orange-100">
+<div *ngIf="currentPage === 'steps' && currentStep > 0" class="dir-rtl text-right app-container min-h-screen bg-gradient-to-br from-orange-50 to-orange-100">
   
   <!-- Step Progress Section -->
   <div class="bg-white border-b border-gray-200 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class=" dir-rtl text-right max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
       <!-- Desktop Step Indicator -->
       <div class="hidden md:flex items-center justify-center py-6">
@@ -144,8 +141,7 @@
   </main>
 </div>
 
-<!-- Footer - Only show on home page -->
-<app-footer *ngIf="currentStep === 0"></app-footer>
+
 
 <!-- Loading Overlay -->
 <div *ngIf="isLoading" 
@@ -207,3 +203,5 @@
     </div>
   </div>
 </div>
+<!-- Footer - Only show on home page -->
+<app-footer ></app-footer>
