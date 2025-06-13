@@ -8,6 +8,8 @@ export interface Certificate {
   customText: string;
   textAreas: TextArea[];
   generatedAt: Date;
+  certificateName?: string; // إضافة خاصية اسم الشهادة (اختيارية)
+
   settings: CertificateSettings;
 }
 
@@ -28,4 +30,6 @@ export interface CertificateProject {
   settings: CertificateSettings;
   createdAt: Date;
   updatedAt: Date;
+  certificateName?: string; // إضافة خاصية اسم الشهادة (اختيارية)
+
 }

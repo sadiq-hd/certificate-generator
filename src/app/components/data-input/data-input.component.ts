@@ -37,6 +37,9 @@ export class DataInputComponent implements OnInit, OnDestroy {
   isLoading: boolean = false;
   loadingMessage: string = '';
 
+  // إضافة متغير اسم الشهادة الجديد
+  certificateName: string = '';
+
   // إضافة متغيرات جديدة للشعار
   institutionLogo: string | null = null; // base64 للشعار
   logoFileName: string = '';
@@ -75,6 +78,13 @@ export class DataInputComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(text => {
         this.customText = text;
+      });
+
+    // إضافة subscription لاسم الشهادة
+    this.certificateService.certificateName$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(name => {
+        this.certificateName = name;
       });
 
     // إضافة subscriptions جديدة
@@ -338,8 +348,8 @@ export class DataInputComponent implements OnInit, OnDestroy {
   }
 
   continueToNext(): void {
-    if (this.students.length === 0 || !this.customText.trim()) {
-      this.setUploadStatus('error', 'يرجى إضافة الطلاب والنص الرئيسي للشهادة');
+    if (this.students.length === 0 || !this.customText.trim() || !this.certificateName.trim()) {
+      this.setUploadStatus('error', 'يرجى إضافة اسم الشهادة والطلاب والنص الرئيسي للشهادة');
       return;
     }
 
@@ -351,6 +361,7 @@ export class DataInputComponent implements OnInit, OnDestroy {
     this.certificateService.setStudents(this.students);
     this.certificateService.setCustomText(this.customText);
     this.certificateService.setManagerName(this.managerName);
+    this.certificateService.setCertificateName(this.certificateName); // إضافة حفظ اسم الشهادة
     
     if (this.institutionLogo) {
       this.certificateService.setInstitutionLogo(this.institutionLogo);

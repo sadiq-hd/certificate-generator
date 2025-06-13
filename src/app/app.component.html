@@ -1,46 +1,57 @@
-<div class="app-container min-h-screen bg-gray-50">
-  <!-- Navigation Header -->
-  <header class="bg-white shadow-sm border-b border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16">
-        <!-- Logo and Title -->
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <svg class="h-8 w-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm1 0v12h12V4H4z" clip-rule="evenodd"></path>
-            </svg>
-          </div>
-          <div class="mr-4">
-            <h1 class="text-xl font-bold text-gray-900">منشئ الشهادات</h1>
-            <p class="text-sm text-gray-500">إنشاء وتخصيص الشهادات بسهولة</p>
-          </div>
-        </div>
+<!-- Header Component - Only show when in steps -->
+<app-header ></app-header>
 
-        <!-- Step Indicator -->
-        <div class="hidden md:flex items-center space-x-8">
+
+<!-- Home Page - Show only when currentPage is home -->
+<app-home *ngIf="currentPage === 'home'" 
+          (startCreating)="startCreating()" 
+          (viewTemplates)="viewTemplates()">
+</app-home>
+
+
+
+<!-- App Container - Only show when in steps -->
+<div *ngIf="currentPage === 'steps' && currentStep > 0" class="dir-rtl text-right app-container min-h-screen bg-gradient-to-br from-orange-50 to-orange-100">
+  
+  <!-- Step Progress Section -->
+  <div class="bg-white border-b border-gray-200 shadow-sm">
+    <div class=" dir-rtl text-right max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Desktop Step Indicator -->
+      <div class="hidden md:flex items-center justify-center py-6">
+        <div class="flex items-center space-x-8">
           <div *ngFor="let step of steps; let i = index"
-               class="flex items-center cursor-pointer transition-all"
+               class="flex items-center cursor-pointer transition-all duration-300 group"
                [class.opacity-50]="currentStep < i + 1"
                (click)="navigateToStep(i + 1)">
             
             <!-- Step Circle -->
-            <div class="flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium transition-colors"
-                 [class.bg-blue-600]="currentStep > i + 1"
+            <div class="flex items-center justify-center w-10 h-10 rounded-full text-sm font-bold transition-all duration-300 group-hover:scale-110"
+                 [class.bg-gradient-to-r]="currentStep > i + 1"
+                 [class.from-orange-500]="currentStep > i + 1"
+                 [class.to-orange-600]="currentStep > i + 1"
                  [class.text-white]="currentStep > i + 1"
-                 [class.bg-blue-100]="currentStep === i + 1"
-                 [class.text-blue-600]="currentStep === i + 1"
+                 [class.shadow-lg]="currentStep > i + 1"
+                 [class.bg-orange-100]="currentStep === i + 1"
+                 [class.text-orange-600]="currentStep === i + 1"
+                 [class.ring-4]="currentStep === i + 1"
+                 [class.ring-orange-200]="currentStep === i + 1"
                  [class.bg-gray-100]="currentStep < i + 1"
                  [class.text-gray-400]="currentStep < i + 1">
               
-              <svg *ngIf="currentStep > i + 1" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <!-- Completed Step Icon -->
+              <svg *ngIf="currentStep > i + 1" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
               </svg>
-              <span *ngIf="currentStep <= i + 1">{{ i + 1 }}</span>
+              
+              <!-- Current/Future Step Number -->
+              <span *ngIf="currentStep <= i + 1" class="font-bold">{{ i + 1 }}</span>
             </div>
 
             <!-- Step Label -->
-            <span class="mr-2 text-sm font-medium transition-colors"
-                  [class.text-blue-600]="currentStep === i + 1"
+            <span class="mr-3 text-sm font-medium transition-all duration-300 group-hover:text-orange-600"
+                  [class.text-orange-600]="currentStep === i + 1"
+                  [class.font-bold]="currentStep === i + 1"
                   [class.text-gray-900]="currentStep > i + 1"
                   [class.text-gray-400]="currentStep < i + 1">
               {{ step.name }}
@@ -48,54 +59,71 @@
 
             <!-- Connector Line -->
             <div *ngIf="i < steps.length - 1" 
-                 class="w-12 h-0.5 mx-4 transition-colors"
-                 [class.bg-blue-600]="currentStep > i + 1"
+                 class="w-16 h-1 mx-6 rounded-full transition-all duration-500"
+                 [class.bg-gradient-to-r]="currentStep > i + 1"
+                 [class.from-orange-500]="currentStep > i + 1"
+                 [class.to-orange-600]="currentStep > i + 1"
                  [class.bg-gray-200]="currentStep <= i + 1"></div>
           </div>
         </div>
+      </div>
 
-        <!-- Action Buttons -->
-        <div class="flex items-center space-x-4">
-          <!-- Save Project -->
-          <button *ngIf="currentStep > 1 && currentStep < 5"
-                  (click)="saveProject()"
-                  class="hidden sm:inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-            <svg class="w-4 h-4 ml-2" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z"></path>
-            </svg>
-            حفظ
-          </button>
-
-          <!-- Help -->
-          <button (click)="showHelp()"
-                  class="p-2 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors rounded-full">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
-            </svg>
-          </button>
+      <!-- Mobile Step Indicator -->
+      <div class="md:hidden px-4 py-4">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center space-x-3">
+            <div class="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full text-sm font-bold shadow-lg">
+              {{ currentStep }}
+            </div>
+            <div>
+              <span class="text-sm font-bold text-orange-600">
+                {{ getCurrentStepName() }}
+              </span>
+              <p class="text-xs text-gray-500 mt-1">
+                الخطوة {{ currentStep }} من {{ steps.length }}
+              </p>
+            </div>
+          </div>
+          
+          <!-- Step Navigation Buttons -->
+          <div class="flex items-center space-x-2">
+            <button *ngIf="currentStep > 1"
+                    (click)="navigateToStep(currentStep - 1)"
+                    class="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-orange-100 hover:text-orange-600 transition-all duration-200">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </button>
+            
+            <!-- Home Button for mobile -->
+            <button (click)="navigateToStep(0)"
+                    class="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-orange-100 hover:text-orange-600 transition-all duration-200">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+              </svg>
+            </button>
+            
+            <button *ngIf="currentStep < steps.length"
+                    (click)="navigateToStep(currentStep + 1)"
+                    class="p-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-md">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+          <div class="bg-gradient-to-r from-orange-500 to-orange-600 h-2 rounded-full transition-all duration-500 ease-out" 
+               [style.width.%]="(currentStep / steps.length) * 100"></div>
         </div>
       </div>
     </div>
-
-    <!-- Mobile Step Indicator -->
-    <div class="md:hidden px-4 pb-4">
-      <div class="flex items-center justify-between">
-        <span class="text-sm font-medium text-gray-500">
-          الخطوة {{ currentStep }} من {{ steps.length }}
-        </span>
-        <span class="text-sm font-medium text-blue-600">
-          {{ getCurrentStepName() }}
-        </span>
-      </div>
-      <div class="mt-2 w-full bg-gray-200 rounded-full h-2">
-        <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" 
-             [style.width.%]="(currentStep / steps.length) * 100"></div>
-      </div>
-    </div>
-  </header>
+  </div>
 
   <!-- Main Content -->
-  <main class="flex-1">
+  <main class="flex-1 min-h-screen">
     <!-- Step 1: Template Selection -->
     <app-template-selector *ngIf="currentStep === 1"></app-template-selector>
 
@@ -111,110 +139,69 @@
     <!-- Step 5: Export Panel -->
     <app-export-panel *ngIf="currentStep === 5"></app-export-panel>
   </main>
+</div>
 
-  <!-- Help Modal -->
-  <div *ngIf="showHelpModal" 
-       class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4"
-       (click)="closeHelp()">
+
+
+<!-- Loading Overlay -->
+<div *ngIf="isLoading" 
+     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+  <div class="bg-white rounded-3xl p-8 flex items-center space-x-4 shadow-2xl border border-gray-100 animate-pulse">
+    <div class="animate-spin rounded-full h-8 w-8 border-4 border-orange-200 border-t-orange-500"></div>
+    <span class="text-gray-700 font-medium">{{ loadingMessage || 'جاري التحميل...' }}</span>
+  </div>
+</div>
+
+<!-- Notification Toast -->
+<div *ngIf="notification" 
+     class="fixed bottom-4 right-4 z-50 transform transition-all duration-300 animate-slide-up">
+  
+  <div class="bg-white rounded-2xl shadow-2xl border max-w-sm overflow-hidden"
+       [class.border-green-200]="notification.type === 'success'"
+       [class.border-red-200]="notification.type === 'error'"
+       [class.border-orange-200]="notification.type === 'info'">
     
-    <div class="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto"
-         (click)="$event.stopPropagation()">
+    <div class="px-4 py-3 border-b"
+         [class.bg-green-50]="notification.type === 'success'"
+         [class.border-green-100]="notification.type === 'success'"
+         [class.bg-red-50]="notification.type === 'error'"
+         [class.border-red-100]="notification.type === 'error'"
+         [class.bg-orange-50]="notification.type === 'info'"
+         [class.border-orange-100]="notification.type === 'info'">
       
-      <!-- Header -->
-      <div class="flex items-center justify-between p-6 border-b border-gray-200">
-        <h3 class="text-lg font-bold text-gray-900">مساعدة</h3>
-        <button (click)="closeHelp()"
-                class="text-gray-400 hover:text-gray-600 transition-colors">
-          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+      <div class="flex items-start">
+        <svg *ngIf="notification.type === 'success'" 
+             class="w-5 h-5 text-green-500 ml-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+        </svg>
+
+        <svg *ngIf="notification.type === 'error'" 
+             class="w-5 h-5 text-red-500 ml-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+        </svg>
+
+        <svg *ngIf="notification.type === 'info'" 
+             class="w-5 h-5 text-orange-500 ml-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+        </svg>
+
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-bold text-gray-900">{{ notification.title }}</p>
+        </div>
+
+        <button (click)="closeNotification()"
+                class="mr-2 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
           </svg>
         </button>
       </div>
-
-      <!-- Content -->
-      <div class="p-6 space-y-6">
-        <div *ngFor="let step of steps; let i = index" class="border-b border-gray-200 last:border-b-0 pb-4 last:pb-0">
-          <h4 class="font-semibold text-gray-800 mb-2 flex items-center">
-            <span class="inline-flex items-center justify-center w-6 h-6 bg-blue-100 text-blue-600 rounded-full text-sm font-medium ml-2">
-              {{ i + 1 }}
-            </span>
-            {{ step.name }}
-          </h4>
-          <p class="text-sm text-gray-600 mb-3">{{ step.description }}</p>
-          
-          <div *ngIf="step.tips && step.tips.length > 0" class="mt-3">
-            <p class="text-xs font-medium text-gray-700 mb-2">💡 نصائح مفيدة:</p>
-            <ul class="text-xs text-gray-600 space-y-1">
-              <li *ngFor="let tip of step.tips" class="flex items-start">
-                <span class="inline-block w-1.5 h-1.5 bg-blue-400 rounded-full mt-1.5 ml-2 flex-shrink-0"></span>
-                {{ tip }}
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <!-- Footer -->
-      <div class="flex justify-end p-6 border-t border-gray-200">
-        <button (click)="closeHelp()"
-                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-          إغلاق
-        </button>
-      </div>
     </div>
-  </div>
 
-  <!-- Loading Overlay -->
-  <div *ngIf="isLoading" 
-       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg p-8 flex items-center space-x-4 shadow-xl">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      <span class="text-gray-700 font-medium">{{ loadingMessage }}</span>
-    </div>
-  </div>
-
-  <!-- Notification Toast -->
-  <div *ngIf="notification" 
-       class="fixed bottom-4 right-4 z-50 transform transition-all duration-300 animate-slide-up">
-    
-    <div class="bg-white rounded-lg shadow-lg border max-w-sm"
-         [class.border-green-200]="notification.type === 'success'"
-         [class.border-red-200]="notification.type === 'error'"
-         [class.border-blue-200]="notification.type === 'info'">
-      
-      <div class="p-4">
-        <div class="flex items-start">
-          <!-- Success Icon -->
-          <svg *ngIf="notification.type === 'success'" 
-               class="w-5 h-5 text-green-500 ml-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-          </svg>
-
-          <!-- Error Icon -->
-          <svg *ngIf="notification.type === 'error'" 
-               class="w-5 h-5 text-red-500 ml-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-          </svg>
-
-          <!-- Info Icon -->
-          <svg *ngIf="notification.type === 'info'" 
-               class="w-5 h-5 text-blue-500 ml-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-          </svg>
-
-          <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium text-gray-900">{{ notification.title }}</p>
-            <p *ngIf="notification.message" class="text-sm text-gray-600 mt-1">{{ notification.message }}</p>
-          </div>
-
-          <button (click)="closeNotification()"
-                  class="mr-2 text-gray-400 hover:text-gray-600 transition-colors">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-            </svg>
-          </button>
-        </div>
-      </div>
+    <div *ngIf="notification.message" class="px-4 py-3">
+      <p class="text-sm text-gray-600 leading-relaxed">{{ notification.message }}</p>
     </div>
   </div>
 </div>
+<!-- Footer - Only show on home page -->
+<app-footer ></app-footer>

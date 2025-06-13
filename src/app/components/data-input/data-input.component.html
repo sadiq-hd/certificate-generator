@@ -1,39 +1,75 @@
-<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-8">
+<div class="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 p-4 md:p-8 animate-fade-in" dir="rtl">
     <div class="max-w-4xl mx-auto">
       <!-- Header -->
-      <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-gray-800 mb-4">إدخال البيانات</h1>
-        <p class="text-lg text-gray-600">أضف أسماء الطلاب والمعلومات الأساسية</p>
+      <div class="text-center mb-8 animate-slide-up">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full mb-4 shadow-lg transform hover:scale-105 transition-transform duration-200">
+          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">إدخال البيانات</h1>
+        <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">أضف أسماء الطلاب والمعلومات الأساسية للشهادة</p>
       </div>
   
       <!-- Progress Bar -->
-      <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
-        <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+      <div class="w-full bg-gray-200 rounded-full h-3 mb-8 shadow-inner overflow-hidden">
+        <div class="bg-gradient-to-r from-orange-500 to-orange-600 h-3 rounded-full transition-all duration-500 ease-out" 
              style="width: 40%"></div>
       </div>
   
       <!-- Selected Template Info -->
-      <div *ngIf="selectedTemplate" class="bg-white rounded-lg shadow-md p-4 mb-6">
-        <div class="flex items-center space-x-4">
-          <img [src]="selectedTemplate.thumbnail || selectedTemplate.imagePath" 
-               [alt]="selectedTemplate.name"
-               class="w-16 h-12 object-cover rounded">
-          <div>
-            <h3 class="font-semibold text-gray-800">{{ selectedTemplate.name }}</h3>
+      <div *ngIf="selectedTemplate" class="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-gray-100 transform hover:shadow-xl transition-all duration-300">
+        <div class="flex items-center gap-4">
+          <div class="relative group">
+            <img [src]="selectedTemplate.thumbnail || selectedTemplate.imagePath" 
+                 [alt]="selectedTemplate.name"
+                 class="w-20 h-16 object-cover rounded-xl border-2 border-gray-200 group-hover:border-orange-300 transition-all duration-200">
+            <div class="absolute inset-0 bg-orange-500 bg-opacity-0 group-hover:bg-opacity-10 rounded-xl transition-all duration-200"></div>
+          </div>
+          <div class="flex-1">
+            <h3 class="font-bold text-lg text-gray-800 mb-1">{{ selectedTemplate.name }}</h3>
             <p class="text-sm text-gray-600">{{ selectedTemplate.description }}</p>
+          </div>
+          <div class="flex items-center gap-2 text-green-600 bg-green-50 px-3 py-2 rounded-full border border-green-200">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm font-medium">محدد</span>
           </div>
         </div>
       </div>
   
       <div class="space-y-8">
+        <!-- Certificate Name Section -->
+        <div class="bg-white rounded-3xl shadow-lg p-6 border border-gray-100 transform hover:shadow-xl transition-all duration-300">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-1 h-8 bg-gradient-to-b from-purple-500 to-purple-700 rounded-full"></div>
+            <h2 class="text-2xl font-bold text-gray-800">تسمية الشهادة</h2>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-3">
+              اسم الشهادة أو المناسبة
+            </label>
+            <input type="text" 
+                   [(ngModel)]="certificateName"
+                   placeholder="مثال: شهادة تقدير، شهادة إتمام الدورة، شهادة مشاركة..."
+                   class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 text-lg">
+            <p class="text-xs text-gray-500 mt-2">سيظهر هذا الاسم في الشهادة كعنوان رئيسي</p>
+          </div>
+        </div>
+
         <!-- Students Data Section -->
-        <div class="bg-white rounded-xl shadow-lg p-6">
-          <h2 class="text-2xl font-bold text-gray-800 mb-6">بيانات الطلاب</h2>
+        <div class="bg-white rounded-3xl shadow-lg p-6 border border-gray-100 transform hover:shadow-xl transition-all duration-300">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-1 h-8 bg-gradient-to-b from-blue-500 to-blue-700 rounded-full"></div>
+            <h2 class="text-2xl font-bold text-gray-800">بيانات الطلاب</h2>
+          </div>
           
           <!-- Upload Methods -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <!-- Excel Upload -->
-            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+            <div class="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-orange-400 hover:bg-orange-50 transition-all duration-300 group">
               <input type="file" 
                      #fileInput 
                      (change)="onFileSelected($event)"
@@ -41,20 +77,23 @@
                      class="hidden">
               
               <div class="space-y-4">
-                <div class="text-blue-500">
-                  <svg class="w-12 h-12 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                <div class="text-orange-500 transform group-hover:scale-110 transition-transform duration-200">
+                  <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2zM3 5a1 1 0 011-1h12a1 1 0 011 1v8a1 1 0 01-1 1H4a1 1 0 01-1-1V5z" clip-rule="evenodd"></path>
                   </svg>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-800">رفع ملف Excel</h3>
-                <p class="text-sm text-gray-600">ارفع ملف Excel أو CSV يحتوي على أسماء الطلاب</p>
+                <h3 class="text-xl font-bold text-gray-800 group-hover:text-orange-700 transition-colors">رفع ملف Excel</h3>
+                <p class="text-sm text-gray-600 group-hover:text-gray-700 transition-colors">ارفع ملف Excel أو CSV يحتوي على أسماء الطلاب</p>
                 <button (click)="fileInput.click()"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        class="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all duration-200 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                   اختر ملف
                 </button>
-                <div class="mt-2">
+                <div class="mt-3">
                   <button (click)="downloadSample()"
-                          class="text-sm text-blue-600 hover:underline">
+                          class="text-sm text-orange-600 hover:text-orange-700 hover:underline transition-all duration-200 flex items-center gap-1 mx-auto">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
                     تحميل ملف نموذجي
                   </button>
                 </div>
@@ -62,17 +101,17 @@
             </div>
   
             <!-- Manual Input -->
-            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6">
+            <div class="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-green-400 hover:bg-green-50 transition-all duration-300 group">
               <div class="space-y-4">
-                <div class="text-green-500">
-                  <svg class="w-12 h-12 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                <div class="text-green-500 transform group-hover:scale-110 transition-transform duration-200">
+                  <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.828-2.828z"></path>
                   </svg>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-800">إدخال يدوي</h3>
-                <p class="text-sm text-gray-600">أضف أسماء الطلاب واحداً تلو الآخر</p>
+                <h3 class="text-xl font-bold text-gray-800 group-hover:text-green-700 transition-colors">إدخال يدوي</h3>
+                <p class="text-sm text-gray-600 group-hover:text-gray-700 transition-colors">أضف أسماء الطلاب واحداً تلو الآخر</p>
                 <button (click)="showManualInput = true"
-                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                        class="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                   بدء الإدخال
                 </button>
               </div>
@@ -80,34 +119,56 @@
           </div>
   
           <!-- File Upload Status -->
-          <div *ngIf="uploadStatus" class="mb-4 p-4 rounded-lg"
-               [class.bg-green-100]="uploadStatus.type === 'success'"
-               [class.bg-red-100]="uploadStatus.type === 'error'"
-               [class.bg-blue-100]="uploadStatus.type === 'info'">
-            <p [class.text-green-700]="uploadStatus.type === 'success'"
-               [class.text-red-700]="uploadStatus.type === 'error'"
-               [class.text-blue-700]="uploadStatus.type === 'info'">
-              {{ uploadStatus.message }}
-            </p>
+          <div *ngIf="uploadStatus" class="mb-6 p-4 rounded-2xl border-l-4 animate-slide-up"
+               [class.bg-green-50]="uploadStatus.type === 'success'"
+               [class.bg-red-50]="uploadStatus.type === 'error'"
+               [class.bg-blue-50]="uploadStatus.type === 'info'"
+               [class.border-green-500]="uploadStatus.type === 'success'"
+               [class.border-red-500]="uploadStatus.type === 'error'"
+               [class.border-blue-500]="uploadStatus.type === 'info'">
+            <div class="flex items-center gap-3">
+              <div class="flex-shrink-0">
+                <svg *ngIf="uploadStatus.type === 'success'" class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                <svg *ngIf="uploadStatus.type === 'error'" class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+                <svg *ngIf="uploadStatus.type === 'info'" class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <p class="font-medium"
+                 [class.text-green-700]="uploadStatus.type === 'success'"
+                 [class.text-red-700]="uploadStatus.type === 'error'"
+                 [class.text-blue-700]="uploadStatus.type === 'info'">
+                {{ uploadStatus.message }}
+              </p>
+            </div>
           </div>
   
           <!-- Manual Input Form -->
-          <div *ngIf="showManualInput" class="border rounded-lg p-4 mb-4">
-            <h4 class="font-semibold mb-4">إضافة طالب جديد</h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input type="text" 
-                     [(ngModel)]="newStudentName"
-                     placeholder="اسم الطالب"
-                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <div *ngIf="showManualInput" class="border-2 border-green-200 rounded-2xl p-6 mb-6 bg-green-50 animate-slide-up">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-1 h-6 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
+              <h4 class="font-bold text-lg text-gray-800">إضافة طالب جديد</h4>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="md:col-span-2">
+                <input type="text" 
+                       [(ngModel)]="newStudentName"
+                       placeholder="اسم الطالب"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 hover:border-gray-400">
+              </div>
               
               <div class="flex gap-2">
                 <button (click)="addStudent()"
                         [disabled]="!newStudentName.trim()"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors">
+                        class="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:transform-none">
                   إضافة
                 </button>
-                <button (click)="showManualInput = false"
-                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+                <button (click)="showManualInput = false; newStudentName = ''"
+                        class="px-4 py-3 bg-gray-300 text-gray-700 rounded-xl hover:bg-gray-400 transition-all duration-200 font-medium transform hover:-translate-y-0.5">
                   إلغاء
                 </button>
               </div>
@@ -115,20 +176,35 @@
           </div>
   
           <!-- Students List -->
-          <div *ngIf="students.length > 0" class="space-y-2">
-            <h4 class="font-semibold text-gray-800">قائمة الطلاب ({{ students.length }})</h4>
-            <div class="max-h-60 overflow-y-auto border rounded-lg">
+          <div *ngIf="students.length > 0" class="space-y-4 animate-fade-in">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-lg text-gray-800 flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9 12a1 1 0 01-1-1V6a1 1 0 012 0v5a1 1 0 01-1 1z"></path>
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-7-8a7 7 0 1114 0 7 7 0 01-14 0z" clip-rule="evenodd"></path>
+                </svg>
+                قائمة الطلاب
+              </h4>
+              <div class="flex items-center gap-2 bg-blue-50 px-3 py-2 rounded-full border border-blue-200">
+                <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9 12a1 1 0 01-1-1V6a1 1 0 012 0v5a1 1 0 01-1 1z"></path>
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-7-8a7 7 0 1114 0 7 7 0 01-14 0z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="text-sm font-medium text-blue-700">{{ students.length }} طالب</span>
+              </div>
+            </div>
+            
+            <div class="max-h-80 overflow-y-auto border-2 border-gray-200 rounded-2xl bg-gray-50 scrollbar-thin scrollbar-thumb-orange-300 scrollbar-track-gray-100">
               <div *ngFor="let student of students; let i = index" 
-                   class="flex items-center justify-between p-3 border-b last:border-b-0 hover:bg-gray-50">
-                <div class="flex items-center space-x-3">
-                  <span class="text-sm text-gray-500">{{ i + 1 }}</span>
-                  <span class="font-medium">{{ student.name }}</span>
-                  <span *ngIf="student.image" class="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
-                    صورة ✓
-                  </span>
+                   class="flex items-center justify-between p-4 border-b border-gray-200 last:border-b-0 hover:bg-white transition-all duration-200 group">
+                <div class="flex items-center gap-4">
+                  <div class="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full text-sm font-bold">
+                    {{ i + 1 }}
+                  </div>
+                  <span class="font-medium text-gray-800 group-hover:text-blue-700 transition-colors">{{ student.name }}</span>
                 </div>
                 <button (click)="removeStudent(student.id)"
-                        class="text-red-500 hover:text-red-700 transition-colors">
+                        class="text-red-500 hover:text-red-700 transition-all duration-200 p-2 rounded-xl hover:bg-red-50 transform hover:scale-110">
                   <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
                   </svg>
@@ -139,145 +215,72 @@
         </div>
   
         <!-- Certificate Text Section -->
-        <div class="bg-white rounded-xl shadow-lg p-6">
-          <h2 class="text-2xl font-bold text-gray-800 mb-6">نص الشهادة</h2>
+        <div class="bg-white rounded-3xl shadow-lg p-6 border border-gray-100 transform hover:shadow-xl transition-all duration-300">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-1 h-8 bg-gradient-to-b from-emerald-500 to-emerald-700 rounded-full"></div>
+            <h2 class="text-2xl font-bold text-gray-800">محتوى الشهادة</h2>
+          </div>
           
-          <div class="space-y-4">
+          <div class="space-y-6">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
+              <label class="block text-sm font-medium text-gray-700 mb-3">
                 النص الرئيسي للشهادة
               </label>
               <textarea [(ngModel)]="customText"
                         rows="4"
-                        placeholder="اكتب النص الذي سيظهر في الشهادة..."
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        placeholder="اكتب النص الذي سيظهر في الشهادة... مثال: نشهد بأن الطالب قد أتم بنجاح..."
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 resize-none"></textarea>
+              <p class="text-xs text-gray-500 mt-2">يمكنك استخدام متغيرات مثل اسم الطالب إذا كانت متاحة في النظام</p>
             </div>
   
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <!-- اسم المدير -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-gray-700 mb-3">
                   اسم المدير/المسؤول
                 </label>
                 <input type="text" 
                        [(ngModel)]="managerName"
-                       placeholder="اسم المدير"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                       placeholder="اسم المدير أو المسؤول"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 hover:border-gray-400">
               </div>
   
               <!-- شعار المؤسسة -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-gray-700 mb-3">
                   شعار المؤسسة (اختياري)
                 </label>
                 
                 <!-- إذا مافيه شعار -->
                 <div *ngIf="!institutionLogo">
-                  <input type="file" 
-                         (change)="onLogoSelected($event)"
-                         accept="image/*"
-                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <div class="relative">
+                    <input type="file" 
+                           (change)="onLogoSelected($event)"
+                           accept="image/*"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+                  </div>
+                  <p class="text-xs text-gray-500 mt-2">اختر ملف صورة (PNG, JPG, SVG)</p>
                 </div>
                 
                 <!-- إذا فيه شعار -->
-                <div *ngIf="institutionLogo" class="space-y-2">
-                  <div class="flex items-center space-x-2 p-2 border rounded-lg bg-gray-50">
-                    <img [src]="institutionLogo" alt="الشعار" class="w-12 h-12 object-contain border rounded">
-                    <div class="flex-1">
-                      <p class="text-sm text-gray-600">{{ logoFileName }}</p>
-                      <button (click)="removeLogo()" 
-                              class="text-red-500 hover:text-red-700 text-sm transition-colors">
-                        حذف الشعار
-                      </button>
+                <div *ngIf="institutionLogo" class="space-y-3 animate-fade-in">
+                  <div class="flex items-center gap-4 p-4 border-2 border-emerald-200 rounded-xl bg-emerald-50">
+                    <div class="relative group">
+                      <img [src]="institutionLogo" alt="الشعار" class="w-16 h-16 object-contain border-2 border-white rounded-xl shadow-md group-hover:scale-105 transition-transform duration-200">
+                      <div class="absolute inset-0 bg-emerald-500 bg-opacity-0 group-hover:bg-opacity-10 rounded-xl transition-all duration-200"></div>
                     </div>
+                    <div class="flex-1">
+                      <p class="text-sm font-medium text-emerald-800 mb-1">{{ logoFileName }}</p>
+                      <p class="text-xs text-emerald-600">تم تحميل الشعار بنجاح</p>
+                    </div>
+                    <button (click)="removeLogo()" 
+                            class="text-red-500 hover:text-red-700 transition-all duration-200 p-2 rounded-xl hover:bg-red-50 transform hover:scale-110">
+                      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd"></path>
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                      </svg>
+                    </button>
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-  
-        <!-- Images Upload Section -->
-        <div class="bg-white rounded-xl shadow-lg p-6">
-          <h2 class="text-2xl font-bold text-gray-800 mb-6">صور الطلاب (اختياري)</h2>
-          
-          <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-400 transition-colors">
-            <input type="file" 
-                   #imagesInput
-                   (change)="onImagesSelected($event)"
-                   accept="image/*"
-                   multiple
-                   class="hidden">
-            
-            <div class="space-y-4">
-              <div class="text-purple-500">
-                <svg class="w-12 h-12 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
-              <h3 class="text-lg font-semibold text-gray-800">رفع صور الطلاب</h3>
-              <p class="text-sm text-gray-600">ارفع صور الطلاب لإضافتها للشهادات (يجب أن تكون أسماء الملفات مطابقة لأسماء الطلاب)</p>
-              <button (click)="imagesInput.click()"
-                      class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
-                اختر الصور
-              </button>
-              
-              <!-- نصائح للمطابقة -->
-              <div class="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p class="text-xs text-yellow-800">
-                  💡 نصيحة: أسماء الملفات يجب أن تحتوي على أسماء الطلاب (مثال: احمد.jpg، فاطمة.png)
-                </p>
-              </div>
-            </div>
-          </div>
-  
-          <!-- Uploaded Images -->
-          <div *ngIf="uploadedImages.length > 0" class="mt-6">
-            <h4 class="font-semibold mb-3 text-gray-800">الصور المرفوعة ({{ uploadedImages.length }})</h4>
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-              <div *ngFor="let image of uploadedImages" class="relative group">
-                <img [src]="image.url" 
-                     [alt]="image.name" 
-                     class="w-full h-20 object-cover rounded border shadow-sm hover:shadow-md transition-shadow">
-                
-                <!-- اسم الملف -->
-                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-1 rounded-b truncate">
-                  {{ image.name }}
-                </div>
-                
-                <!-- زر الحذف -->
-                <button (click)="removeImage(image.name)"
-                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100">
-                  ×
-                </button>
-                
-                <!-- مؤشر المطابقة -->
-                <div *ngIf="isImageMatched(image.name)" 
-                     class="absolute top-1 left-1 bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                  ✓
-                </div>
-              </div>
-            </div>
-            
-            <!-- إحصائيات المطابقة -->
-            <div class="mt-3 flex items-center justify-between text-sm text-gray-600">
-              <span>{{ getMatchedImagesCount() }} من {{ uploadedImages.length }} صورة تم ربطها بالطلاب</span>
-              <button (click)="showImageMatching = !showImageMatching"
-                      class="text-blue-600 hover:text-blue-700 transition-colors">
-                {{ showImageMatching ? 'إخفاء' : 'عرض' }} تفاصيل الربط
-              </button>
-            </div>
-            
-            <!-- تفاصيل ربط الصور -->
-            <div *ngIf="showImageMatching" class="mt-3 p-3 bg-gray-50 rounded-lg">
-              <h5 class="font-medium text-gray-800 mb-2">تفاصيل ربط الصور:</h5>
-              <div class="space-y-1 text-sm">
-                <div *ngFor="let student of students" class="flex items-center justify-between">
-                  <span>{{ student.name }}</span>
-                  <span [class.text-green-600]="student.image" 
-                        [class.text-gray-400]="!student.image">
-                    {{ student.image ? '✓ مربوطة' : '○ غير مربوطة' }}
-                  </span>
                 </div>
               </div>
             </div>
@@ -286,26 +289,264 @@
       </div>
   
       <!-- Action Buttons -->
-      <div class="flex justify-between items-center mt-8">
+      <div class="flex flex-col sm:flex-row justify-between items-center mt-8 gap-4 animate-fade-in">
         <button (click)="goBack()"
-                class="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-400 transition-colors">
+                class="w-full sm:w-auto px-8 py-4 bg-gray-300 text-gray-700 rounded-2xl font-medium hover:bg-gray-400 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1">
           السابق
         </button>
         
-        <button (click)="continueToNext()"
-                [disabled]="students.length === 0 || !customText.trim()"
-                class="px-8 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
-          التالي
-        </button>
+        <div class="flex flex-col sm:flex-row gap-4">
+          <button (click)="continueToNext()"
+                  [disabled]="students.length === 0 || !customText.trim() || !certificateName.trim()"
+                  class="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-2xl font-medium hover:from-orange-600 hover:to-orange-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:transform-none">
+            التالي
+          </button>
+        </div>
       </div>
   
       <!-- Loading Overlay -->
       <div *ngIf="isLoading" 
-           class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg p-6 flex items-center space-x-4">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <span class="text-gray-700">{{ loadingMessage }}</span>
+           class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-8 flex items-center gap-4 shadow-2xl transform animate-pulse">
+          <div class="animate-spin rounded-full h-8 w-8 border-4 border-orange-500 border-t-transparent"></div>
+          <span class="text-gray-700 font-medium">{{ loadingMessage || 'جاري المعالجة...' }}</span>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Custom CSS for file input and animations -->
+  <style>
+    /* Animation Keyframes */
+    @keyframes fadeIn {
+      from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0); 
+      }
+    }
+    
+    @keyframes slideUp {
+      from { 
+        opacity: 0; 
+        transform: translateY(30px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0); 
+      }
+    }
+    
+    .animate-fade-in {
+      animation: fadeIn 0.6s ease-out;
+    }
+    
+    .animate-slide-up {
+      animation: slideUp 0.5s ease-out;
+    }
+    
+    /* Scrollbar Styling */
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    .scrollbar-track-gray-100::-webkit-scrollbar-track {
+      background: #f3f4f6;
+      border-radius: 10px;
+    }
+    
+    .scrollbar-thumb-orange-300::-webkit-scrollbar-thumb {
+      background: linear-gradient(45deg, #f97316, #ea580c);
+      border-radius: 10px;
+    }
+    
+    .scrollbar-thumb-orange-300::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(45deg, #ea580c, #c2410c);
+    }
+    
+    /* File input styling */
+    input[type="file"]::-webkit-file-upload-button {
+      visibility: hidden;
+    }
+    
+    input[type="file"]::before {
+      content: 'اختر ملف';
+      display: inline-block;
+      background: linear-gradient(45deg, #10b981, #059669);
+      color: white;
+      border: none;
+      border-radius: 0.75rem;
+      padding: 0.5rem 1rem;
+      outline: none;
+      white-space: nowrap;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.875rem;
+      margin-left: 0.5rem;
+    }
+    
+    input[type="file"]:hover::before {
+      background: linear-gradient(45deg, #059669, #047857);
+    }
+    
+    /* Custom shadow utilities */
+    .shadow-inner {
+      box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+    }
+    
+    /* Backdrop filter support */
+    .backdrop-blur-sm {
+      backdrop-filter: blur(4px);
+    }
+    
+    /* RTL Direction Support */
+    [dir="rtl"] input[type="text"], 
+    [dir="rtl"] textarea, 
+    [dir="rtl"] select {
+      text-align: right;
+    }
+    
+    /* Focus states enhancement */
+    input:focus, 
+    textarea:focus, 
+    select:focus {
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+    }
+    
+    /* Button active states */
+    button:active:not(:disabled) {
+      transform: translateY(0) !important;
+    }
+    
+    /* Grid responsive utilities */
+    @media (max-width: 768px) {
+      .md\:grid-cols-2 {
+        grid-template-columns: 1fr;
+      }
+      
+      .md\:grid-cols-3 {
+        grid-template-columns: 1fr;
+      }
+      
+      .md\:col-span-2 {
+        grid-column: span 1;
+      }
+    }
+    
+    /* Loading animation */
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    
+    .animate-spin {
+      animation: spin 1s linear infinite;
+    }
+    
+    /* Enhanced hover effects */
+    .group:hover .group-hover\:scale-110 {
+      transform: scale(1.1);
+    }
+    
+    .group:hover .group-hover\:text-orange-700 {
+      color: #c2410c;
+    }
+    
+    .group:hover .group-hover\:text-green-700 {
+      color: #15803d;
+    }
+    
+    .group:hover .group-hover\:text-gray-700 {
+      color: #374151;
+    }
+    
+    /* Progress bar animation */
+    .progress-bar {
+      transition: width 0.5s ease-out;
+    }
+    
+    /* Status indicator animations */
+    .status-success {
+      animation: fadeIn 0.5s ease-out, pulse 2s infinite;
+    }
+    
+    .status-error {
+      animation: fadeIn 0.5s ease-out, shake 0.5s ease-out;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    
+    /* File drop zone enhancements */
+    .drop-zone-active {
+      border-color: #f97316 !important;
+      background-color: rgba(249, 115, 22, 0.1) !important;
+      transform: scale(1.02);
+    }
+    
+    /* Custom utilities */
+    .text-shadow {
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Enhanced border gradients */
+    .border-gradient-orange {
+      border: 2px solid;
+      border-image: linear-gradient(45deg, #f97316, #ea580c) 1;
+      border-radius: 1rem;
+    }
+    
+    .border-gradient-green {
+      border: 2px solid;
+      border-image: linear-gradient(45deg, #10b981, #059669) 1;
+      border-radius: 1rem;
+    }
+    
+    /* Smooth transitions for all interactive elements */
+    * {
+      transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      transition-duration: 200ms;
+    }
+    
+    /* Enhanced form validation states */
+    .form-valid {
+      border-color: #10b981 !important;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+    }
+    
+    .form-invalid {
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+    }
+    
+    /* Loading state overlay */
+    .loading-overlay {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(4px);
+    }
+    
+    /* Enhanced card hover effects */
+    .card-hover {
+      transform: translateY(0);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+  </style>

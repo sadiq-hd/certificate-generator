@@ -7,346 +7,361 @@ import { DataInputComponent } from './components/data-input/data-input.component
 import { CertificateEditorComponent } from './components/certificate-editor/certificate-editor.component';
 import { PreviewPanelComponent } from './components/preview-panel/preview-panel.component';
 import { ExportPanelComponent } from './components/export-panel/export-panel.component';
+import { HeaderComponent } from "./components/header/header.component";
+import { HomeComponent } from "./components/home/home.component";
+import { ContactComponent } from "./components/contact/contact.component";
+import { FooterComponent } from "./components/footer/footer.component";
+
 
 interface Step {
-  id: number;
-  name: string;
-  description: string;
-  tips?: string[];
+id: number;
+name: string;
+description: string;
+tips?: string[];
 }
 
 interface Notification {
-  type: 'success' | 'error' | 'info';
-  title: string;
-  message?: string;
+type: 'success' | 'error' | 'info';
+title: string;
+message?: string;
 }
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [
-    CommonModule,
-    TemplateSelectorComponent,
-    DataInputComponent,
-    CertificateEditorComponent,
-    PreviewPanelComponent,
-    ExportPanelComponent
-  ],
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+selector: 'app-root',
+standalone: true,
+imports: [
+  CommonModule,
+  TemplateSelectorComponent,
+  DataInputComponent,
+  CertificateEditorComponent,
+  PreviewPanelComponent,
+  ExportPanelComponent,
+  HeaderComponent,
+  HomeComponent,
+  ContactComponent,
+  FooterComponent
+],
+templateUrl: './app.component.html',
+styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  currentStep: number = 1;
-  isLoading: boolean = false;
-  loadingMessage: string = '';
-  showHelpModal: boolean = false;
-  notification: Notification | null = null;
+currentStep: number = 0; // Start with home page
+currentPage: 'home' | 'contact' | 'steps' = 'home'; // Track current page
+isLoading: boolean = false;
+isSaving: boolean = false;
+loadingMessage: string = '';
+notification: Notification | null = null;
 
-  steps: Step[] = [
-    {
-      id: 1,
-      name: 'اختيار القالب',
-      description: 'اختر تصميم الشهادة المناسب من القوالب المتاحة',
-      tips: [
-        'تأكد من أن القالب يناسب نوع الشهادة المطلوبة',
-        'يمكنك معاينة كل قالب قبل الاختيار',
-        'القوالب قابلة للتخصيص في الخطوات التالية'
-      ]
-    },
-    {
-      id: 2,
-      name: 'إدخال البيانات',
-      description: 'أضف أسماء الطلاب والنصوص المطلوبة للشهادة',
-      tips: [
-        'يمكنك رفع ملف Excel يحتوي على أسماء الطلاب',
-        'تأكد من أن العمود الأول يحتوي على الأسماء',
-        'يمكنك إضافة الأسماء يدوياً واحداً تلو الآخر',
-        'رفع الصور اختياري ولكنه يحسن من جودة الشهادات'
-      ]
-    },
-    {
-      id: 3,
-      name: 'تحرير الشهادة',
-      description: 'خصص مواقع النصوص والخطوط حسب احتياجاتك',
-      tips: [
-        'اسحب النصوص لتغيير مواقعها',
-        'استخدم الأدوات الجانبية لتغيير الخطوط والألوان',
-        'يمكنك تكبير وتصغير العرض للتحكم الدقيق',
-        'استخدم أسهم لوحة المفاتيح للحركة الدقيقة'
-      ]
-    },
-    {
-      id: 4,
-      name: 'معاينة الشهادات',
-      description: 'راجع جميع الشهادات المولدة قبل التصدير',
-      tips: [
-        'تأكد من صحة جميع البيانات قبل التصدير',
-        'يمكنك عرض الشهادات بطرق مختلفة (شبكة، قائمة، فردي)',
-        'استخدم البحث للعثور على شهادة معينة بسرعة',
-        'حدد الشهادات التي تريد تصديرها'
-      ]
-    },
-    {
-      id: 5,
-      name: 'تصدير الشهادات',
-      description: 'اختر إعدادات التصدير وحمل الملفات النهائية',
-      tips: [
-        'اختر التنسيق المناسب (PNG للجودة العالية، JPG للحجم الأصغر، PDF للطباعة)',
-        'الجودة العالية تعطي نتائج أفضل لكنها تستغرق وقتاً أطول',
-        'يمكنك تصدير شهادة واحدة أو جميع الشهادات',
-        'احفظ المشروع للعودة إليه لاحقاً'
-      ]
-    }
-  ];
-
-  private destroy$ = new Subject<void>();
-
-  constructor(private certificateService: CertificateService) {}
-
-  ngOnInit(): void {
-    this.setupSubscriptions();
-    this.checkInitialState();
-    this.startAutoSave();
+steps: Step[] = [
+  {
+    id: 1,
+    name: 'اختيار القالب',
+    description: 'اختر تصميم الشهادة المناسب من القوالب المتاحة'
+  },
+  {
+    id: 2,
+    name: 'إدخال البيانات',
+    description: 'أضف أسماء الطلاب والنصوص المطلوبة للشهادة'
+  },
+  {
+    id: 3,
+    name: 'تحرير الشهادة',
+    description: 'خصص مواقع النصوص والخطوط حسب احتياجاتك'
+  },
+  {
+    id: 4,
+    name: 'معاينة الشهادات',
+    description: 'راجع جميع الشهادات المولدة قبل التصدير'
+  },
+  {
+    id: 5,
+    name: 'تصدير الشهادات',
+    description: 'اختر إعدادات التصدير وحمل الملفات النهائية'
   }
+];
 
-  ngOnDestroy(): void {
-    this.stopAutoSave();
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
+private destroy$ = new Subject<void>();
+private autoSaveTimer?: NodeJS.Timeout;
 
-  private setupSubscriptions(): void {
-    // Listen to current step changes
-    this.certificateService.currentStep$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(step => {
+constructor(private certificateService: CertificateService) {}
+
+ngOnInit(): void {
+  // Always start at home page
+  this.currentStep = 0;
+  
+  this.setupSubscriptions();
+  this.checkInitialState();
+  this.startAutoSave();
+}
+
+ngOnDestroy(): void {
+  this.stopAutoSave();
+  this.destroy$.next();
+  this.destroy$.complete();
+}
+
+private setupSubscriptions(): void {
+  this.certificateService.currentStep$
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(step => {
+      // Only sync steps 1-5, don't sync home page (0)
+      // And don't sync if we're intentionally on home page
+      if (step > 0 && step !== this.currentStep && this.currentStep !== 0) {
         this.currentStep = step;
-      });
-  }
-
-  private checkInitialState(): void {
-    // Check if there's a saved project in localStorage
-    const savedData = localStorage.getItem('certificateApp');
-    if (savedData) {
-      try {
-        const data = JSON.parse(savedData);
-        if (data.currentStep) {
-          this.showNotification('info', 'مرحباً بعودتك!', 'تم استعادة مشروعك السابق');
-        }
-      } catch (error) {
-        console.error('Error loading saved data:', error);
       }
-    }
-  }
+    });
+}
 
-  // Step navigation methods
-  getCurrentStepName(): string {
-    const step = this.steps.find(s => s.id === this.currentStep);
-    return step ? step.name : '';
-  }
+private checkInitialState(): void {
+  // For development: Always start fresh
+  this.clearSavedData();
+  
+  // Force reset to home page
+  this.currentStep = 0;
+  this.certificateService.setCurrentStep(0);
+  
+  // Don't load any saved data for now
+  console.log('Starting fresh on home page');
+}
 
-  // Navigation method - الدالة المفقودة
-  navigateToStep(step: number): void {
-    // التحقق من صحة الخطوة
-    if (step < 1 || step > this.steps.length) {
-      return;
-    }
+// Clear saved data (for development)
+private clearSavedData(): void {
+  localStorage.removeItem('certificateApp');
+}
 
-    // السماح بالعودة للخطوات السابقة
-    if (step <= this.currentStep) {
-      this.certificateService.setCurrentStep(step);
-      return;
-    }
+// Force reset to home page
+private forceResetToHome(): void {
+  this.currentStep = 0;
+  this.certificateService.resetToHome();
+  this.closeNotification();
+}
 
-    // التحقق من إمكانية الانتقال للخطوة التالية
-    if (step === this.currentStep + 1) {
-      if (this.canMoveToStep(step)) {
-        this.certificateService.setCurrentStep(step);
-      } else {
-        this.showNotification('info', 'تنبيه', this.getStepRequirementMessage(step));
-      }
-    } else {
-      this.showNotification('info', 'تنبيه', 'يجب إكمال الخطوات السابقة أولاً');
-    }
-  }
-
-  // التحقق من إمكانية الانتقال للخطوة
-  private canMoveToStep(step: number): boolean {
-    switch (step) {
-      case 2: // إدخال البيانات
-        return !!this.certificateService.getSelectedTemplate();
-      
-      case 3: // تحرير الشهادة
-        return !!this.certificateService.getSelectedTemplate() && 
-               this.certificateService.getStudents().length > 0;
-      
-      case 4: // معاينة الشهادات
-        return !!this.certificateService.getSelectedTemplate() && 
-               this.certificateService.getStudents().length > 0 &&
-               !!this.certificateService.getCustomText();
-      
-      case 5: // تصدير الشهادات
-        return this.certificateService.getGeneratedCertificates().length > 0;
-      
-      default:
-        return true;
-    }
-  }
-
-  // رسائل متطلبات الخطوات
-  private getStepRequirementMessage(step: number): string {
-    switch (step) {
-      case 2:
-        return 'يجب اختيار قالب أولاً';
-      case 3:
-        return 'يجب إضافة أسماء الطلاب أولاً';
-      case 4:
-        return 'يجب إضافة نص الشهادة أولاً';
-      case 5:
-        return 'يجب إنشاء الشهادات أولاً';
-      default:
-        return 'يجب إكمال الخطوات السابقة أولاً';
-    }
-  }
-
-  // Project management
-  saveProject(): void {
+// Method to restore saved project
+restoreSavedProject(): void {
+  const savedData = localStorage.getItem('certificateApp');
+  if (savedData) {
     try {
-      this.certificateService.saveCurrentProject();
-      this.showNotification('success', 'تم الحفظ', 'تم حفظ المشروع بنجاح');
+      const data = JSON.parse(savedData);
+      if (data.currentStep && data.currentStep > 0) {
+        this.currentStep = data.currentStep;
+        this.certificateService.setCurrentStep(data.currentStep);
+        this.showNotification('success', 'تم الاستعادة!', 'تم استعادة مشروعك السابق');
+      }
     } catch (error) {
-      console.error('Save error:', error);
-      this.showNotification('error', 'خطأ في الحفظ', 'حدث خطأ أثناء حفظ المشروع');
+      console.error('Error restoring saved data:', error);
+      this.showNotification('error', 'خطأ', 'حدث خطأ في استعادة البيانات');
     }
   }
+}
 
-  // Help modal
-  showHelp(): void {
-    this.showHelpModal = true;
-    document.body.style.overflow = 'hidden';
+// Home page actions
+startCreating(): void {
+  this.navigateToStep(1);
+  this.showNotification('success', 'يلا نبدأ!', 'تم الانتقال لاختيار القالب');
+}
+
+viewTemplates(): void {
+  this.navigateToStep(1);
+  this.showNotification('info', 'استعراض القوالب', 'اختر القالب المناسب لك');
+}
+
+// Step navigation methods
+getCurrentStepName(): string {
+  if (this.currentStep === 0) {
+    return 'الصفحة الرئيسية';
+  }
+  const step = this.steps.find(s => s.id === this.currentStep);
+  return step ? step.name : 'صفحة غير معروفة';
+}
+
+navigateToStep(step: number): void {
+  // Allow going to home page anytime
+  if (step === 0) {
+    this.currentStep = 0;
+    this.currentPage = 'home';
+    // Don't update service for home page
+    return;
   }
 
-  closeHelp(): void {
-    this.showHelpModal = false;
-    document.body.style.overflow = 'auto';
+  // Check valid step range
+  if (step < 1 || step > this.steps.length) {
+    return;
   }
 
-  // Loading state
-  setLoading(loading: boolean, message: string = ''): void {
-    this.isLoading = loading;
-    this.loadingMessage = message;
+  // When navigating to steps, ensure we're on steps page
+  this.currentPage = 'steps';
+
+  // Allow going back to previous steps
+  if (step <= this.currentStep) {
+    this.currentStep = step;
+    this.certificateService.setCurrentStep(step);
+    return;
   }
 
-  // Notification system
-  showNotification(type: Notification['type'], title: string, message?: string): void {
-    this.notification = { type, title, message };
-    
-    // Auto-hide after 5 seconds
+  // For forward navigation, check requirements
+  if (step === this.currentStep + 1) {
+    if (this.canMoveToStep(step)) {
+      this.currentStep = step;
+      this.certificateService.setCurrentStep(step);
+    } else {
+      this.showNotification('info', 'تنبيه', this.getStepRequirementMessage(step));
+    }
+  } else {
+    this.showNotification('info', 'تنبيه', 'يجب إكمال الخطوات السابقة أولاً');
+  }
+}
+
+private canMoveToStep(step: number): boolean {
+  switch (step) {
+    case 1: // Template selection - always accessible
+      return true;
+    case 2:
+      return !!this.certificateService.getSelectedTemplate();
+    case 3:
+      return !!this.certificateService.getSelectedTemplate() && 
+             this.certificateService.getStudents().length > 0;
+    case 4:
+      return !!this.certificateService.getSelectedTemplate() && 
+             this.certificateService.getStudents().length > 0 &&
+             !!this.certificateService.getCustomText();
+    case 5:
+      return this.certificateService.getGeneratedCertificates().length > 0;
+    default:
+      return true;
+  }
+}
+
+private getStepRequirementMessage(step: number): string {
+  switch (step) {
+    case 2:
+      return 'يجب اختيار قالب أولاً';
+    case 3:
+      return 'يجب إضافة أسماء الطلاب أولاً';
+    case 4:
+      return 'يجب إضافة نص الشهادة أولاً';
+    case 5:
+      return 'يجب إنشاء الشهادات أولاً';
+    default:
+      return 'يجب إكمال الخطوات السابقة أولاً';
+  }
+}
+
+// Project management - للهيدر
+saveProject(): void {
+  if (this.isSaving) return;
+
+  this.isSaving = true;
+  
+  try {
+    this.certificateService.saveCurrentProject();
+    this.showNotification('success', 'تم الحفظ', 'تم حفظ المشروع بنجاح');
+  } catch (error) {
+    console.error('Save error:', error);
+    this.showNotification('error', 'خطأ في الحفظ', 'حدث خطأ أثناء حفظ المشروع');
+  } finally {
     setTimeout(() => {
+      this.isSaving = false;
+    }, 1000);
+  }
+}
+
+// Notification system
+showNotification(type: Notification['type'], title: string, message?: string): void {
+  this.notification = { type, title, message };
+  setTimeout(() => {
+    this.closeNotification();
+  }, 5000);
+}
+
+closeNotification(): void {
+  this.notification = null;
+}
+
+// Keyboard shortcuts
+@HostListener('document:keydown', ['$event'])
+onKeydown(event: KeyboardEvent): void {
+  // Home shortcut (Ctrl+H) - always available
+  if ((event.ctrlKey || event.metaKey) && event.key === 'h') {
+    event.preventDefault();
+    this.goToHome();
+  }
+
+  // Save shortcut (Ctrl+S) - only when in steps
+  if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+    event.preventDefault();
+    if (this.currentStep > 0 && this.currentStep < 5) {
+      this.saveProject();
+    }
+  }
+
+  // Escape to close modals or go back to home
+  if (event.key === 'Escape') {
+    if (this.notification) {
       this.closeNotification();
-    }, 5000);
-  }
-
-  closeNotification(): void {
-    this.notification = null;
-  }
-
-  // Keyboard shortcuts
-  @HostListener('document:keydown', ['$event'])
-  onKeydown(event: KeyboardEvent): void {
-    // Help shortcut (F1)
-    if (event.key === 'F1') {
-      event.preventDefault();
-      this.showHelp();
-    }
-
-    // Save shortcut (Ctrl+S)
-    if ((event.ctrlKey || event.metaKey) && event.key === 's') {
-      event.preventDefault();
-      if (this.currentStep > 1 && this.currentStep < 5) {
-        this.saveProject();
-      }
-    }
-
-    // Escape to close modals
-    if (event.key === 'Escape') {
-      if (this.showHelpModal) {
-        this.closeHelp();
-      }
-      if (this.notification) {
-        this.closeNotification();
-      }
-    }
-
-    // Arrow keys for step navigation
-    if (event.ctrlKey) {
-      switch (event.key) {
-        case 'ArrowLeft':
-          if (this.currentStep > 1) {
-            this.navigateToStep(this.currentStep - 1);
-          }
-          event.preventDefault();
-          break;
-        case 'ArrowRight':
-          if (this.currentStep < this.steps.length) {
-            this.navigateToStep(this.currentStep + 1);
-          }
-          event.preventDefault();
-          break;
-      }
+    } else {
+      this.goToHome();
     }
   }
 
-  // Error handling
-  handleError(error: any, context: string = ''): void {
-    console.error(`Error in ${context}:`, error);
-    
-    let message = 'حدث خطأ غير متوقع';
-    if (error instanceof Error) {
-      message = error.message;
-    }
-    
-    this.showNotification('error', 'خطأ', message);
-    this.setLoading(false);
-  }
-
-  // Lifecycle hooks for components
-  onComponentInit(step: number): void {
-    console.log(`Component for step ${step} initialized`);
-  }
-
-  onComponentDestroy(step: number): void {
-    console.log(`Component for step ${step} destroyed`);
-  }
-
-  // Utility methods
-  isStepAccessible(stepId: number): boolean {
-    return stepId <= this.currentStep || this.canMoveToStep(stepId);
-  }
-
-  isStepCompleted(stepId: number): boolean {
-    return stepId < this.currentStep;
-  }
-
-  // Auto-save functionality
-  private autoSaveTimer?: NodeJS.Timeout;
-
-  private startAutoSave(): void {
-    this.autoSaveTimer = setInterval(() => {
-      if (this.currentStep > 1 && this.currentStep < 5) {
-        try {
-          this.certificateService.saveCurrentProject();
-          console.log('Auto-saved at', new Date().toLocaleTimeString());
-        } catch (error) {
-          console.warn('Auto-save failed:', error);
+  // Arrow keys for step navigation - only when in steps
+  if (event.ctrlKey && this.currentStep > 0) {
+    switch (event.key) {
+      case 'ArrowLeft':
+        if (this.currentStep > 1) {
+          this.navigateToStep(this.currentStep - 1);
+        } else {
+          this.goToHome();
         }
-      }
-    }, 30000); // Auto-save every 30 seconds
-  }
-
-  private stopAutoSave(): void {
-    if (this.autoSaveTimer) {
-      clearInterval(this.autoSaveTimer);
+        event.preventDefault();
+        break;
+      case 'ArrowRight':
+        if (this.currentStep < this.steps.length) {
+          this.navigateToStep(this.currentStep + 1);
+        }
+        event.preventDefault();
+        break;
     }
   }
+}
+
+// Auto-save functionality - only for steps, not home
+private startAutoSave(): void {
+  this.autoSaveTimer = setInterval(() => {
+    if (this.currentStep > 0 && this.currentStep <= 5 && !this.isSaving) {
+      try {
+        this.certificateService.saveCurrentProject();
+        console.log('Auto-saved at', new Date().toLocaleTimeString());
+      } catch (error) {
+        console.warn('Auto-save failed:', error);
+      }
+    }
+  }, 30000); // Auto-save every 30 seconds
+}
+
+private stopAutoSave(): void {
+  if (this.autoSaveTimer) {
+    clearInterval(this.autoSaveTimer);
+  }
+}
+
+// Utility methods
+goToHome(): void {
+  this.currentStep = 0;
+  this.currentPage = 'home';
+  // Don't show notification when going home via shortcut during startup
+  if (this.currentStep !== 0) {
+    this.showNotification('info', 'العودة للرئيسية', 'تم الانتقال للصفحة الرئيسية');
+  }
+}
+
+// Handle browser back button
+@HostListener('window:popstate', ['$event'])
+onPopState(event: any): void {
+  // Handle browser back button
+  if (this.currentStep > 1) {
+    this.navigateToStep(this.currentStep - 1);
+  } else {
+    this.goToHome();
+  }
+}
 }

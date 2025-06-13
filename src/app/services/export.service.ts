@@ -8,6 +8,8 @@ import JSZip from 'jszip';
   providedIn: 'root'
 })
 export class ExportService {
+  // خاصية الشعار
+  private institutionLogo: string | null = null;
 
   constructor() {}
 
@@ -18,24 +20,76 @@ export class ExportService {
     settings: CertificateSettings
   ): Promise<Blob> {
     try {
+      // التأكد من أن العنصر مرئي قبل التصدير
+      const originalStyle = certificateElement.style.cssText;
+      certificateElement.style.position = 'fixed';
+      certificateElement.style.left = '-9999px';
+      certificateElement.style.top = '-9999px';
+      certificateElement.style.visibility = 'visible';
+      certificateElement.style.opacity = '1';
+      certificateElement.style.zIndex = '-1000';
+
+      // انتظار تحميل الصور
+      await this.waitForImages(certificateElement);
+
       const canvas = await html2canvas(certificateElement, {
         scale: settings.scale,
         backgroundColor: settings.backgroundColor,
         useCORS: true,
-        allowTaint: true,
+        allowTaint: false,
         logging: false,
         width: certificate.template.width,
-        height: certificate.template.height
+        height: certificate.template.height,
+        foreignObjectRendering: false,
+        imageTimeout: 15000,
+        removeContainer: false
       });
 
-      return new Promise((resolve) => {
+      // إعادة الستايل الأصلي
+      certificateElement.style.cssText = originalStyle;
+
+      return new Promise((resolve, reject) => {
         canvas.toBlob((blob) => {
-          resolve(blob!);
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error('فشل في إنشاء الصورة'));
+          }
         }, `image/${settings.format}`, this.getQuality(settings.quality));
       });
     } catch (error) {
       throw new Error('فشل في تصدير الشهادة كصورة: ' + error);
     }
+  }
+
+  // انتظار تحميل جميع الصور في العنصر
+  private waitForImages(element: HTMLElement): Promise<void> {
+    return new Promise((resolve) => {
+      const images = element.querySelectorAll('img');
+      if (images.length === 0) {
+        resolve();
+        return;
+      }
+
+      let loadedCount = 0;
+      const totalImages = images.length;
+
+      const checkComplete = () => {
+        loadedCount++;
+        if (loadedCount === totalImages) {
+          resolve();
+        }
+      };
+
+      images.forEach((img) => {
+        if (img.complete && img.naturalHeight !== 0) {
+          checkComplete();
+        } else {
+          img.onload = checkComplete;
+          img.onerror = checkComplete; // حتى لو فشلت الصورة، نكمل
+        }
+      });
+    });
   }
 
   // Export single certificate as PDF
@@ -45,13 +99,26 @@ export class ExportService {
     settings: CertificateSettings
   ): Promise<Blob> {
     try {
+      // التأكد من أن العنصر مرئي
+      const originalStyle = certificateElement.style.cssText;
+      certificateElement.style.position = 'fixed';
+      certificateElement.style.left = '-9999px';
+      certificateElement.style.top = '-9999px';
+      certificateElement.style.visibility = 'visible';
+      certificateElement.style.opacity = '1';
+
+      await this.waitForImages(certificateElement);
+
       const canvas = await html2canvas(certificateElement, {
         scale: settings.scale,
         backgroundColor: settings.backgroundColor,
         useCORS: true,
-        allowTaint: true,
+        allowTaint: false,
         logging: false
       });
+
+      // إعادة الستايل الأصلي
+      certificateElement.style.cssText = originalStyle;
 
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF({
@@ -75,6 +142,66 @@ export class ExportService {
     }
   }
 
+  // إنشاء عنصر شهادة مؤقت للتصدير
+  private createTemporaryCertificateElement(certificate: Certificate): HTMLElement {
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.left = '-9999px';
+    container.style.top = '-9999px';
+    container.style.width = certificate.template.width + 'px';
+    container.style.height = certificate.template.height + 'px';
+    container.style.background = 'white';
+    container.style.visibility = 'hidden';
+
+    // صورة الخلفية
+    const bgImg = document.createElement('img');
+    bgImg.src = certificate.template.imagePath;
+    bgImg.style.position = 'absolute';
+    bgImg.style.top = '0';
+    bgImg.style.left = '0';
+    bgImg.style.width = '100%';
+    bgImg.style.height = '100%';
+    bgImg.style.objectFit = 'cover';
+    container.appendChild(bgImg);
+
+    // النصوص
+    certificate.textAreas.forEach(textArea => {
+      const textElement = document.createElement('div');
+      textElement.style.position = 'absolute';
+      textElement.style.left = (textArea.x - textArea.width/2) + 'px';
+      textElement.style.top = (textArea.y - textArea.height/2) + 'px';
+      textElement.style.width = textArea.width + 'px';
+      textElement.style.height = textArea.height + 'px';
+      textElement.style.fontFamily = textArea.fontFamily;
+      textElement.style.fontSize = textArea.fontSize + 'px';
+      textElement.style.fontWeight = textArea.fontWeight;
+      textElement.style.color = textArea.color;
+      textElement.style.textAlign = textArea.textAlign;
+      textElement.style.lineHeight = '1.4';
+      textElement.style.display = 'flex';
+      textElement.style.alignItems = 'center';
+      textElement.style.justifyContent = 'center';
+      textElement.style.wordBreak = 'break-word';
+      textElement.style.overflow = 'hidden';
+
+      if (textArea.id === 'logo' && this.institutionLogo) {
+        const logoImg = document.createElement('img');
+        logoImg.src = this.institutionLogo;
+        logoImg.style.maxWidth = '100%';
+        logoImg.style.maxHeight = '100%';
+        logoImg.style.objectFit = 'contain';
+        textElement.appendChild(logoImg);
+      } else if (textArea.id !== 'logo') {
+        textElement.textContent = this.getDisplayText(certificate, textArea);
+      }
+
+      container.appendChild(textElement);
+    });
+
+    document.body.appendChild(container);
+    return container;
+  }
+
   // Export multiple certificates
   async exportMultipleCertificates(
     certificates: Certificate[],
@@ -92,25 +219,24 @@ export class ExportService {
       const certificate = certificates[i];
       
       try {
-        // Find certificate element in DOM
-        const certElement = document.getElementById(`certificate-${certificate.id}`);
-        if (!certElement) {
-          console.warn(`Certificate element not found for ${certificate.student.name}`);
-          continue;
-        }
+        // إنشاء عنصر مؤقت للشهادة
+        const tempElement = this.createTemporaryCertificateElement(certificate);
 
         let blob: Blob;
         let filename: string;
 
         if (settings.format === 'pdf') {
-          blob = await this.exportCertificateAsPDF(certElement, certificate, settings);
+          blob = await this.exportCertificateAsPDF(tempElement, certificate, settings);
           filename = `${this.sanitizeFilename(certificate.student.name)}.pdf`;
         } else {
-          blob = await this.exportCertificateAsImage(certElement, certificate, settings);
+          blob = await this.exportCertificateAsImage(tempElement, certificate, settings);
           filename = `${this.sanitizeFilename(certificate.student.name)}.${settings.format}`;
         }
 
         folder?.file(filename, blob);
+
+        // إزالة العنصر المؤقت
+        document.body.removeChild(tempElement);
 
         // Update progress
         if (onProgress) {
@@ -124,7 +250,8 @@ export class ExportService {
     return zip.generateAsync({ type: 'blob' });
   }
 
-  // Download blob as file
+  // باقي الدوال تبقى كما هي...
+  
   downloadBlob(blob: Blob, filename: string): void {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -136,14 +263,15 @@ export class ExportService {
     URL.revokeObjectURL(url);
   }
 
-  // Export single certificate
   async exportSingleCertificate(
     certificate: Certificate,
     settings: CertificateSettings
   ): Promise<void> {
-    const certElement = document.getElementById(`certificate-${certificate.id}`);
+    let certElement = document.getElementById(`certificate-${certificate.id}`);
+    
+    // إذا ما لقينا العنصر، ننشئ واحد مؤقت
     if (!certElement) {
-      throw new Error('عنصر الشهادة غير موجود');
+      certElement = this.createTemporaryCertificateElement(certificate);
     }
 
     let blob: Blob;
@@ -157,45 +285,81 @@ export class ExportService {
       filename = `${this.sanitizeFilename(certificate.student.name)}.${settings.format}`;
     }
 
+    // إذا كان عنصر مؤقت، نحذفه
+    if (!document.getElementById(`certificate-${certificate.id}`)) {
+      document.body.removeChild(certElement);
+    }
+
     this.downloadBlob(blob, filename);
   }
 
-  // Export all certificates
   async exportAllCertificates(
     certificates: Certificate[],
     settings: CertificateSettings,
     onProgress?: (progress: number) => void
   ): Promise<void> {
     if (certificates.length === 1) {
-      // Single certificate - download directly
       await this.exportSingleCertificate(certificates[0], settings);
     } else {
-      // Multiple certificates - create ZIP
       const zipBlob = await this.exportMultipleCertificates(certificates, settings, onProgress);
       const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
       this.downloadBlob(zipBlob, `certificates_${timestamp}.zip`);
     }
   }
 
-  // Preview certificate for export
-  async previewCertificate(
-    certificateElement: HTMLElement,
-    certificate: Certificate,
-    settings: CertificateSettings
-  ): Promise<string> {
-    try {
-      const canvas = await html2canvas(certificateElement, {
-        scale: Math.min(settings.scale, 1), // Lower scale for preview
-        backgroundColor: settings.backgroundColor,
-        useCORS: true,
-        allowTaint: true,
-        logging: false
-      });
-
-      return canvas.toDataURL('image/png', 0.8);
-    } catch (error) {
-      throw new Error('فشل في إنشاء معاينة الشهادة: ' + error);
+  // Helper methods
+  private getQuality(quality: string): number {
+    switch (quality) {
+      case 'high': return 1.0;
+      case 'medium': return 0.8;
+      case 'low': return 0.6;
+      default: return 0.8;
     }
+  }
+
+  private sanitizeFilename(filename: string): string {
+    return filename
+      .replace(/[<>:"/\\|?*]/g, '_')
+      .replace(/\s+/g, '_')
+      .substring(0, 100);
+  }
+
+  private getDisplayText(certificate: Certificate, textArea: any): string {
+    switch (textArea.id) {
+      case 'name':
+        return certificate.student.name || textArea.defaultText;
+      case 'title':
+        return textArea.defaultText;
+      case 'content':
+        return certificate.customText || textArea.defaultText;
+      case 'manager':
+        return this.managerName || textArea.defaultText; // استخدام اسم المدير المحفوظ
+      case 'date':
+        return new Date().toLocaleDateString('ar-SA') || textArea.defaultText;
+      default:
+        return textArea.defaultText;
+    }
+  }
+
+  // إضافة خاصية اسم المدير
+  private managerName: string = '';
+
+  // إضافة دالة setInstitutionLogo
+  setInstitutionLogo(logo: string | null): void {
+    this.institutionLogo = logo;
+  }
+
+  getInstitutionLogo(): string | null {
+    return this.institutionLogo;
+  }
+
+  // إضافة دالة تعيين اسم المدير
+  setManagerName(name: string): void {
+    this.managerName = name;
+  }
+
+  getManagerName(): string {
+    return this.managerName;
   }
 
   // Get file size estimate
@@ -239,23 +403,6 @@ export class ExportService {
     const totalBytes = this.parseSize(singleSize) * certificates.length;
 
     return this.formatFileSize(totalBytes);
-  }
-
-  // Helper methods
-  private getQuality(quality: string): number {
-    switch (quality) {
-      case 'high': return 1.0;
-      case 'medium': return 0.8;
-      case 'low': return 0.6;
-      default: return 0.8;
-    }
-  }
-
-  private sanitizeFilename(filename: string): string {
-    return filename
-      .replace(/[<>:"/\\|?*]/g, '_')
-      .replace(/\s+/g, '_')
-      .substring(0, 100);
   }
 
   private formatFileSize(bytes: number): { size: string; unit: string } {

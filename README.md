@@ -216,4 +216,4 @@ For support or to report issues, please open an Issue in the repository.
 
 ---
 
-**Developed with ❤️ by Sadiq Al-Dubaissi**
+**Developed with ❤️ by Sadiq Al-Dubaisi**
