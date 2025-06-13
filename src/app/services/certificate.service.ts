@@ -9,7 +9,7 @@ import { Template, TextArea } from '../models/template.model';
 })
 export class CertificateService {
   private currentProjectSubject = new BehaviorSubject<CertificateProject | null>(null);
-  private currentStepSubject = new BehaviorSubject<number>(1);
+  private currentStepSubject = new BehaviorSubject<number>(0);
   private studentsSubject = new BehaviorSubject<Student[]>([]);
   private selectedTemplateSubject = new BehaviorSubject<Template | null>(null);
   private customTextSubject = new BehaviorSubject<string>('');
@@ -305,6 +305,18 @@ export class CertificateService {
     this.setCurrentStep(1);
     this.clearLocalStorage();
   }
+
+  
+// Reset to home page (step 0)
+resetToHome(): void {
+  this.currentStepSubject.next(0);
+  // Don't clear other data, just reset step to home
+}
+
+// Reset everything including step
+resetState(): void {
+  this.resetAll();
+}
 
   // Helper methods
   private generateId(): string {

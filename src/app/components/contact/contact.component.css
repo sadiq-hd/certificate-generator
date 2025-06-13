@@ -1,0 +1,87 @@
+/* Contact form animations */
+.contact-form {
+    transition: all 0.3s ease;
+  }
+  
+  .contact-form:hover {
+    transform: translateY(-2px);
+  }
+  
+  /* Form field animations */
+  input:focus, select:focus, textarea:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Button hover effects */
+  button:hover {
+    transform: translateY(-2px);
+  }
+  
+  button:active {
+    transform: translateY(0);
+  }
+  
+  /* Contact card hover effects */
+  .contact-card {
+    transition: all 0.3s ease;
+  }
+  
+  .contact-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Loading animation */
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+  
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  /* Success message animation */
+  @keyframes slideInFromTop {
+    from {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  .success-message {
+    animation: slideInFromTop 0.5s ease-out;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .contact-card:hover {
+      transform: none;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      transform: none;
+    }
+  }
+  
+  /* RTL support improvements */
+  [dir="rtl"] input, 
+  [dir="rtl"] select, 
+  [dir="rtl"] textarea {
+    text-align: right;
+  }
+  
+  [dir="ltr"] input[type="email"],
+  [dir="ltr"] input[type="tel"] {
+    text-align: left;
+    direction: ltr;
+  }

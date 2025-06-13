@@ -22,6 +22,9 @@ export class HeaderComponent {
   @Output() saveClicked = new EventEmitter<void>();
   @Output() helpClicked = new EventEmitter<void>();
 
+  showHelpModal: boolean = false;
+
+  // Steps data - نفس البيانات من الملف الأصلي
   steps: Step[] = [
     {
       id: 1,
@@ -78,17 +81,18 @@ export class HeaderComponent {
       ]
     }
   ];
-  showMobileMenu: boolean = false;
 
   onSave(): void {
     this.saveClicked.emit();
   }
 
   onHelp(): void {
-    this.helpClicked.emit();
+    this.showHelpModal = true;
+    document.body.style.overflow = 'hidden';
   }
 
-  toggleMobileMenu(): void {
-    this.showMobileMenu = !this.showMobileMenu;
+  closeHelp(): void {
+    this.showHelpModal = false;
+    document.body.style.overflow = 'auto';
   }
 }
