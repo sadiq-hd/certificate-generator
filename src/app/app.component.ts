@@ -7,6 +7,7 @@ import { DataInputComponent } from './components/data-input/data-input.component
 import { CertificateEditorComponent } from './components/certificate-editor/certificate-editor.component';
 import { PreviewPanelComponent } from './components/preview-panel/preview-panel.component';
 import { ExportPanelComponent } from './components/export-panel/export-panel.component';
+import { HeaderComponent } from "./components/header/header.component";
 
 interface Step {
   id: number;
@@ -30,8 +31,9 @@ interface Notification {
     DataInputComponent,
     CertificateEditorComponent,
     PreviewPanelComponent,
-    ExportPanelComponent
-  ],
+    ExportPanelComponent,
+    HeaderComponent
+],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })

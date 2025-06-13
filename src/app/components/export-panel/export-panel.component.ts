@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { Certificate, CertificateSettings } from '../../models/certificate.model';
 import { Template, TextArea } from '../../models/template.model';
+import { Student } from '../../models/student.model';
 import { CertificateService } from '../../services/certificate.service';
 import { ExportService } from '../../services/export.service';
 import { AppSettings } from '../../app.settings';
@@ -18,6 +19,11 @@ import { AppSettings } from '../../app.settings';
 export class ExportPanelComponent implements OnInit, OnDestroy {
   certificates: Certificate[] = [];
   selectedTemplate: Template | null = null;
+  students: Student[] = [];
+  customText: string = '';
+  certificateName: string = ''; // إضافة متغير اسم الشهادة
+  managerName: string = '';
+  institutionLogo: string | null = null;
   
   exportSettings: CertificateSettings = {
     quality: 'high',
@@ -74,6 +80,41 @@ export class ExportPanelComponent implements OnInit, OnDestroy {
       .subscribe(template => {
         this.selectedTemplate = template;
         this.calculatePreviewSize();
+      });
+
+    // Load students
+    this.certificateService.students$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(students => {
+        this.students = students;
+      });
+
+    // Load custom text
+    this.certificateService.customText$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(text => {
+        this.customText = text;
+      });
+
+    // إضافة subscription لاسم الشهادة
+    this.certificateService.certificateName$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(name => {
+        this.certificateName = name;
+      });
+
+    // Load manager name
+    this.certificateService.managerName$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(name => {
+        this.managerName = name;
+      });
+
+    // Load institution logo
+    this.certificateService.institutionLogo$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(logo => {
+        this.institutionLogo = logo;
       });
   }
 
@@ -217,12 +258,16 @@ export class ExportPanelComponent implements OnInit, OnDestroy {
       case 'name':
         return certificate.student.name;
       case 'title':
-        return textArea.defaultText;
+        // استخدام اسم الشهادة المدخل من المستخدم
+        return certificate.certificateName || this.certificateName || textArea.defaultText;
       case 'content':
-        return certificate.customText || textArea.defaultText;
+        return certificate.customText || this.customText || textArea.defaultText;
       case 'manager':
-        return textArea.defaultText;
+        return this.managerName || textArea.defaultText;
+      case 'date':
+        return new Date().toLocaleDateString('ar-SA') || textArea.defaultText;
       default:
+        // للنصوص المخصصة
         return textArea.defaultText;
     }
   }
@@ -232,17 +277,49 @@ export class ExportPanelComponent implements OnInit, OnDestroy {
       return '0 KB';
     }
 
-    const sizeEstimate = this.exportService.getEstimatedTotalSize(
-      this.certificates,
-      this.exportSettings
-    );
+    try {
+      const sizeEstimate = this.exportService.getEstimatedTotalSize(
+        this.certificates,
+        this.exportSettings
+      );
 
-    return `${sizeEstimate.size} ${sizeEstimate.unit}`;
+      return `${sizeEstimate.size} ${sizeEstimate.unit}`;
+    } catch (error) {
+      console.error('Error calculating size:', error);
+      // حساب تقريبي بسيط
+      const avgSizePerCert = this.getAverageCertificateSize();
+      const totalSizeKB = (avgSizePerCert * this.certificates.length) / 1024;
+      
+      if (totalSizeKB > 1024) {
+        return `${(totalSizeKB / 1024).toFixed(1)} MB`;
+      }
+      return `${totalSizeKB.toFixed(0)} KB`;
+    }
+  }
+
+  private getAverageCertificateSize(): number {
+    // حساب تقريبي لحجم الشهادة الواحدة
+    if (!this.selectedTemplate) return 500000; // 500KB افتراضي
+
+    const baseSize = this.selectedTemplate.width * this.selectedTemplate.height;
+    const scaleFactor = this.exportSettings.scale || 2;
+    const qualityMultiplier = this.getQualityMultiplier();
+    
+    return baseSize * scaleFactor * qualityMultiplier;
+  }
+
+  private getQualityMultiplier(): number {
+    switch (this.exportSettings.quality) {
+      case 'high': return 3;
+      case 'medium': return 2;
+      case 'low': return 1;
+      default: return 2;
+    }
   }
 
   // Project management
   saveProject(): void {
-    const projectName = prompt('اسم المشروع:', `مشروع_شهادات_${new Date().toLocaleDateString('ar-SA')}`);
+    const projectName = prompt('اسم المشروع:', `مشروع_${this.certificateName || 'شهادات'}_${new Date().toLocaleDateString('ar-SA')}`);
     
     if (projectName) {
       try {
@@ -258,11 +335,59 @@ export class ExportPanelComponent implements OnInit, OnDestroy {
   startOver(): void {
     if (confirm('هل أنت متأكد من بدء مشروع جديد؟ ستفقد جميع البيانات الحالية.')) {
       this.certificateService.resetAll();
+      // Navigate to first step
+      this.certificateService.setCurrentStep(1);
     }
   }
 
   // Navigation
   goBack(): void {
     this.certificateService.previousStep();
+  }
+
+  // Additional helper methods
+  getCurrentDate(): string {
+    return new Date().toLocaleDateString('ar-SA');
+  }
+
+  getCertificateCount(): number {
+    return this.certificates.length;
+  }
+
+  getTemplateInfo(): string {
+    return this.selectedTemplate?.name || 'غير محدد';
+  }
+
+  // Error handling
+  private handleError(error: any, context: string): void {
+    console.error(`Error in ${context}:`, error);
+    const message = error instanceof Error ? error.message : 'حدث خطأ غير متوقع';
+    alert(`خطأ في ${context}: ${message}`);
+  }
+
+  // Validation
+  private validateExportSettings(): boolean {
+    if (!this.exportSettings.format) {
+      alert('يرجى اختيار تنسيق الملف');
+      return false;
+    }
+
+    if (!this.exportSettings.quality) {
+      alert('يرجى اختيار جودة التصدير');
+      return false;
+    }
+
+    if (this.certificates.length === 0) {
+      alert('لا توجد شهادات للتصدير');
+      return false;
+    }
+
+    return true;
+  }
+
+  // Cleanup
+  private cleanup(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

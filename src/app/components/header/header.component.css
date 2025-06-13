@@ -1,0 +1,113 @@
+/* Header Animations */
+@keyframes slide-down {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-slide-down {
+    animation: slide-down 0.3s ease-out;
+  }
+  
+  /* Logo Hover Effects */
+  .logo-container {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .logo-container:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 25px rgba(249, 115, 22, 0.3);
+  }
+  
+  /* Button Enhancements */
+  .save-button {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .save-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+  
+  .save-button:hover::before {
+    left: 100%;
+  }
+  
+  /* Help Button Pulse Effect */
+  .help-button {
+    position: relative;
+  }
+  
+  .help-button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(249, 115, 22, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+  }
+  
+  .help-button:hover::after {
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* Mobile Menu Improvements */
+  .mobile-menu {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  /* Loading Spinner */
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .loading-spinner {
+    animation: spin 1s linear infinite;
+  }
+  
+  /* Focus States */
+  button:focus {
+    outline: 2px solid #f97316;
+    outline-offset: 2px;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 640px) {
+    .header-title {
+      font-size: 1.125rem;
+    }
+    
+    .header-subtitle {
+      font-size: 0.75rem;
+    }
+  }
+  
+  /* Smooth Transitions */
+  * {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }

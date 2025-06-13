@@ -16,6 +16,9 @@ export class CertificateService {
   private generatedCertificatesSubject = new BehaviorSubject<Certificate[]>([]);
   private institutionLogoSubject = new BehaviorSubject<string | null>(null);
   private managerNameSubject = new BehaviorSubject<string>('');
+  
+  // إضافة BehaviorSubject جديد لاسم الشهادة
+  private certificateNameSubject = new BehaviorSubject<string>('');
 
   public currentProject$ = this.currentProjectSubject.asObservable();
   public currentStep$ = this.currentStepSubject.asObservable();
@@ -25,6 +28,9 @@ export class CertificateService {
   public generatedCertificates$ = this.generatedCertificatesSubject.asObservable();
   public institutionLogo$ = this.institutionLogoSubject.asObservable();
   public managerName$ = this.managerNameSubject.asObservable();
+  
+  // إضافة Observable جديد لاسم الشهادة
+  public certificateName$ = this.certificateNameSubject.asObservable();
 
   private undoStack: any[] = [];
   private redoStack: any[] = [];
@@ -97,11 +103,22 @@ export class CertificateService {
     return this.customTextSubject.value;
   }
 
+  // Certificate name methods (جديد)
+  setCertificateName(name: string): void {
+    this.certificateNameSubject.next(name);
+    this.saveToLocalStorage();
+  }
+
+  getCertificateName(): string {
+    return this.certificateNameSubject.value;
+  }
+
   // Certificate generation
   generateCertificates(): Certificate[] {
     const template = this.getSelectedTemplate();
     const students = this.getStudents();
     const customText = this.getCustomText();
+    const certificateName = this.getCertificateName();
 
     if (!template || students.length === 0) {
       return [];
@@ -112,6 +129,7 @@ export class CertificateService {
       student,
       template,
       customText,
+      certificateName, // إضافة اسم الشهادة للبيانات المحفوظة
       textAreas: [...template.textAreas],
       generatedAt: new Date(),
       settings: this.getDefaultSettings()
@@ -166,6 +184,7 @@ export class CertificateService {
       template: this.getSelectedTemplate(),
       students: this.getStudents(),
       customText: this.getCustomText(),
+      certificateName: this.getCertificateName(), // إضافة اسم الشهادة للحالة المحفوظة
       step: this.getCurrentStep()
     };
     
@@ -185,6 +204,7 @@ export class CertificateService {
       template: this.getSelectedTemplate(),
       students: this.getStudents(),
       customText: this.getCustomText(),
+      certificateName: this.getCertificateName(),
       step: this.getCurrentStep()
     };
     
@@ -202,6 +222,7 @@ export class CertificateService {
       template: this.getSelectedTemplate(),
       students: this.getStudents(),
       customText: this.getCustomText(),
+      certificateName: this.getCertificateName(),
       step: this.getCurrentStep()
     };
     
@@ -216,6 +237,7 @@ export class CertificateService {
     if (state.template) this.selectedTemplateSubject.next(state.template);
     if (state.students) this.studentsSubject.next(state.students);
     if (state.customText) this.customTextSubject.next(state.customText);
+    if (state.certificateName) this.certificateNameSubject.next(state.certificateName); // استعادة اسم الشهادة
     if (state.step) this.currentStepSubject.next(state.step);
   }
 
@@ -227,6 +249,7 @@ export class CertificateService {
       template: this.getSelectedTemplate()!,
       students: this.getStudents(),
       customText: this.getCustomText(),
+      certificateName: this.getCertificateName(), // إضافة اسم الشهادة للمشروع
       textAreas: this.getSelectedTemplate()?.textAreas || [],
       settings: this.getDefaultSettings(),
       createdAt: new Date(),
@@ -246,6 +269,7 @@ export class CertificateService {
         template: this.getSelectedTemplate()!,
         students: this.getStudents(),
         customText: this.getCustomText(),
+        certificateName: this.getCertificateName(), // تحديث اسم الشهادة في المشروع
         updatedAt: new Date()
       };
       
@@ -259,6 +283,12 @@ export class CertificateService {
     this.setSelectedTemplate(project.template);
     this.setStudents(project.students);
     this.setCustomText(project.customText);
+    
+    // تحميل اسم الشهادة إذا كان متوفراً
+    if (project.certificateName) {
+      this.setCertificateName(project.certificateName);
+    }
+    
     this.setCurrentStep(1);
   }
 
@@ -267,6 +297,7 @@ export class CertificateService {
     this.selectedTemplateSubject.next(null);
     this.studentsSubject.next([]);
     this.customTextSubject.next('');
+    this.certificateNameSubject.next(''); // إعادة تعيين اسم الشهادة
     this.generatedCertificatesSubject.next([]);
     this.currentProjectSubject.next(null);
     this.institutionLogoSubject.next(null);
@@ -312,6 +343,7 @@ export class CertificateService {
         selectedTemplate: this.getSelectedTemplate(),
         students: this.getStudents(),
         customText: this.getCustomText(),
+        certificateName: this.getCertificateName(), // إضافة اسم الشهادة للحفظ
         generatedCertificates: this.getGeneratedCertificates(),
         currentProject: this.currentProjectSubject.value,
         institutionLogo: this.getInstitutionLogo(),
@@ -331,6 +363,7 @@ export class CertificateService {
           selectedTemplate: this.getSelectedTemplate(),
           students: this.getStudents().slice(0, 50), // حد أقصى 50 طالب
           customText: this.getCustomText(),
+          certificateName: this.getCertificateName(),
           institutionLogo: this.getInstitutionLogo(),
           managerName: this.getManagerName()
         };
@@ -347,7 +380,8 @@ export class CertificateService {
           currentStep: this.getCurrentStep(),
           selectedTemplate: this.getSelectedTemplate(),
           students: this.getStudents().slice(0, 10),
-          customText: this.getCustomText().substring(0, 1000)
+          customText: this.getCustomText().substring(0, 1000),
+          certificateName: this.getCertificateName()
         };
         localStorage.setItem('certificateApp', JSON.stringify(minimumData));
       } catch (fallbackError) {
@@ -367,6 +401,7 @@ export class CertificateService {
         if (data.selectedTemplate) this.selectedTemplateSubject.next(data.selectedTemplate);
         if (data.students && Array.isArray(data.students)) this.studentsSubject.next(data.students);
         if (data.customText) this.customTextSubject.next(data.customText);
+        if (data.certificateName) this.certificateNameSubject.next(data.certificateName); // تحميل اسم الشهادة
         if (data.generatedCertificates && Array.isArray(data.generatedCertificates)) {
           this.generatedCertificatesSubject.next(data.generatedCertificates);
         }
