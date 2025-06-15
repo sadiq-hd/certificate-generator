@@ -1,8 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Certificate, CertificateSettings } from '../models/certificate.model';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
-import JSZip from 'jszip';
 
 @Injectable({
   providedIn: 'root'
@@ -10,8 +8,15 @@ import JSZip from 'jszip';
 export class ExportService {
   // خاصية الشعار
   private institutionLogo: string | null = null;
+  // إضافة خاصية اسم المدير
+  private managerName: string = '';
 
-  constructor() {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+
+  // فحص إذا كنا في المتصفح
+  private get isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
 
   // Export single certificate as image
   async exportCertificateAsImage(
@@ -19,7 +24,13 @@ export class ExportService {
     certificate: Certificate,
     settings: CertificateSettings
   ): Promise<Blob> {
+    if (!this.isBrowser) {
+      throw new Error('Image export is only available in browser environment');
+    }
+
     try {
+      const html2canvas = await import('html2canvas');
+
       // التأكد من أن العنصر مرئي قبل التصدير
       const originalStyle = certificateElement.style.cssText;
       certificateElement.style.position = 'fixed';
@@ -32,7 +43,7 @@ export class ExportService {
       // انتظار تحميل الصور
       await this.waitForImages(certificateElement);
 
-      const canvas = await html2canvas(certificateElement, {
+      const canvas = await html2canvas.default(certificateElement, {
         scale: settings.scale,
         backgroundColor: settings.backgroundColor,
         useCORS: true,
@@ -64,6 +75,10 @@ export class ExportService {
 
   // انتظار تحميل جميع الصور في العنصر
   private waitForImages(element: HTMLElement): Promise<void> {
+    if (!this.isBrowser) {
+      return Promise.resolve();
+    }
+
     return new Promise((resolve) => {
       const images = element.querySelectorAll('img');
       if (images.length === 0) {
@@ -98,7 +113,16 @@ export class ExportService {
     certificate: Certificate,
     settings: CertificateSettings
   ): Promise<Blob> {
+    if (!this.isBrowser) {
+      throw new Error('PDF export is only available in browser environment');
+    }
+
     try {
+      const [{ jsPDF }, html2canvas] = await Promise.all([
+        import('jspdf'),
+        import('html2canvas')
+      ]);
+
       // التأكد من أن العنصر مرئي
       const originalStyle = certificateElement.style.cssText;
       certificateElement.style.position = 'fixed';
@@ -109,7 +133,7 @@ export class ExportService {
 
       await this.waitForImages(certificateElement);
 
-      const canvas = await html2canvas(certificateElement, {
+      const canvas = await html2canvas.default(certificateElement, {
         scale: settings.scale,
         backgroundColor: settings.backgroundColor,
         useCORS: true,
@@ -144,6 +168,10 @@ export class ExportService {
 
   // إنشاء عنصر شهادة مؤقت للتصدير
   private createTemporaryCertificateElement(certificate: Certificate): HTMLElement {
+    if (!this.isBrowser) {
+      throw new Error('DOM manipulation is only available in browser environment');
+    }
+
     const container = document.createElement('div');
     container.style.position = 'fixed';
     container.style.left = '-9999px';
@@ -208,11 +236,16 @@ export class ExportService {
     settings: CertificateSettings,
     onProgress?: (progress: number) => void
   ): Promise<Blob> {
+    if (!this.isBrowser) {
+      throw new Error('Multiple export is only available in browser environment');
+    }
+
     if (certificates.length === 0) {
       throw new Error('لا توجد شهادات للتصدير');
     }
 
-    const zip = new JSZip();
+    const JSZip = await import('jszip');
+    const zip = new JSZip.default();
     const folder = zip.folder('certificates');
 
     for (let i = 0; i < certificates.length; i++) {
@@ -250,9 +283,14 @@ export class ExportService {
     return zip.generateAsync({ type: 'blob' });
   }
 
-  // باقي الدوال تبقى كما هي...
+  // باقي الدوال مع التحقق من البيئة
   
   downloadBlob(blob: Blob, filename: string): void {
+    if (!this.isBrowser) {
+      console.warn('Download functionality is only available in browser environment');
+      return;
+    }
+
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -267,6 +305,10 @@ export class ExportService {
     certificate: Certificate,
     settings: CertificateSettings
   ): Promise<void> {
+    if (!this.isBrowser) {
+      throw new Error('Export functionality is only available in browser environment');
+    }
+
     let certElement = document.getElementById(`certificate-${certificate.id}`);
     
     // إذا ما لقينا العنصر، ننشئ واحد مؤقت
@@ -298,6 +340,10 @@ export class ExportService {
     settings: CertificateSettings,
     onProgress?: (progress: number) => void
   ): Promise<void> {
+    if (!this.isBrowser) {
+      throw new Error('Export functionality is only available in browser environment');
+    }
+
     if (certificates.length === 1) {
       await this.exportSingleCertificate(certificates[0], settings);
     } else {
@@ -333,16 +379,13 @@ export class ExportService {
       case 'content':
         return certificate.customText || textArea.defaultText;
       case 'manager':
-        return this.managerName || textArea.defaultText; // استخدام اسم المدير المحفوظ
+        return this.managerName || textArea.defaultText;
       case 'date':
         return new Date().toLocaleDateString('ar-SA') || textArea.defaultText;
       default:
         return textArea.defaultText;
     }
   }
-
-  // إضافة خاصية اسم المدير
-  private managerName: string = '';
 
   // إضافة دالة setInstitutionLogo
   setInstitutionLogo(logo: string | null): void {
